@@ -343,6 +343,41 @@ h1 {
   gap: 8px;
 }
 
+.sarcomere-controls {
+  display: grid;
+  gap: 8px;
+}
+
+.sarcomere-controls label {
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.sarcomere-controls input[type="range"] {
+  width: 100%;
+}
+
+.force-meter {
+  height: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: #151515;
+}
+
+.force-meter span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--coral), var(--gold), var(--teal));
+}
+
+.cycle-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
 .legend-list {
   display: grid;
   gap: 8px;

@@ -2,6 +2,11 @@
 
 import type { AtlasAction, AtlasState } from "@/lib/atlasState";
 import { FIBER_TYPE_PROFILES, type FiberType } from "@/lib/microAnatomy";
+import {
+  CROSS_BRIDGE_CYCLE,
+  getCrossBridgeStep,
+  getLengthTensionForce,
+} from "@/lib/sarcomere";
 import { getZoomLevel } from "@/lib/zoom";
 import type { Dispatch } from "react";
 
@@ -18,9 +23,12 @@ export default function MicroAnatomyControls({
 }: MicroAnatomyControlsProps) {
   const level = getZoomLevel(state.zoomValue);
 
-  if (level < 5 || level > 6) {
+  if (level < 5 || level > 8) {
     return null;
   }
+
+  const bridgeStep = getCrossBridgeStep(state.crossBridgeStep);
+  const force = getLengthTensionForce(state.sarcomereLengthUm);
 
   return (
     <section
@@ -56,6 +64,47 @@ export default function MicroAnatomyControls({
               {profile.label}
             </button>
           ))}
+        </div>
+      ) : null}
+      {level === 8 ? (
+        <div className="sarcomere-controls">
+          <label htmlFor="sarcomere-length">
+            SL {state.sarcomereLengthUm.toFixed(2)} um
+          </label>
+          <input
+            id="sarcomere-length"
+            max={3.5}
+            min={1.8}
+            onChange={(event) =>
+              dispatch({
+                lengthUm: Number(event.target.value),
+                type: "set_sarcomere_length",
+              })
+            }
+            step={0.05}
+            type="range"
+            value={state.sarcomereLengthUm}
+          />
+          <div className="force-meter" aria-label="Length tension force">
+            <span style={{ width: `${Math.round(force * 100)}%` }} />
+          </div>
+          <p>Force {Math.round(force * 100)}%</p>
+          <div className="cycle-steps" aria-label="Cross-bridge cycle">
+            {CROSS_BRIDGE_CYCLE.map((step, index) => (
+              <button
+                aria-pressed={bridgeStep.id === step.id}
+                key={step.id}
+                onClick={() =>
+                  dispatch({ step: index, type: "set_cross_bridge_step" })
+                }
+                title={step.label}
+                type="button"
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+          <p>{bridgeStep.label}</p>
         </div>
       ) : null}
     </section>

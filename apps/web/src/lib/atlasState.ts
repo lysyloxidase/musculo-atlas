@@ -1,12 +1,15 @@
 import type { GrossLayer } from "./grossAnatomy";
 import type { FiberType } from "./microAnatomy";
+import { clampSarcomereLength } from "./sarcomere";
 import type { ZoomLevel } from "./types";
 
 export interface AtlasState {
   activeLayer: GrossLayer;
   activeRegionId: string;
+  crossBridgeStep: number;
   fascicleCrossSection: boolean;
   fiberType: FiberType;
+  sarcomereLengthUm: number;
   selectedFiberId: string;
   selectedMuscleId: string;
   selectedNodeId: string;
@@ -22,14 +25,20 @@ export type AtlasAction =
   | { type: "select_muscle_belly"; muscleId: string }
   | { type: "select_fiber"; fiberId: string }
   | { type: "select_myofibril"; myofibrilId: string }
+  | { type: "select_sarcomere"; sarcomereId: string }
+  | { type: "select_filament"; filamentId: string }
   | { type: "set_fiber_type"; fiberType: FiberType }
+  | { type: "set_sarcomere_length"; lengthUm: number }
+  | { type: "set_cross_bridge_step"; step: number }
   | { type: "toggle_fascicle_cross_section" };
 
 export const DEFAULT_ATLAS_STATE: AtlasState = {
   activeLayer: "skeleton",
   activeRegionId: "lower_limb",
+  crossBridgeStep: 0,
   fascicleCrossSection: true,
   fiberType: "type_I",
+  sarcomereLengthUm: 2.4,
   selectedFiberId: "fiber_1",
   selectedMuscleId: "rectus_femoris",
   selectedNodeId: "body",
@@ -42,9 +51,14 @@ export function createAtlasStateFromSearch(search: string): AtlasState {
   const node = params.get("node");
   const muscle = params.get("muscle");
   const fiberType = params.get("fiberType") as FiberType | null;
+  const sarcomereLengthUm = Number(params.get("sl"));
+  const crossBridgeStep = Number(params.get("bridge"));
 
   return {
     ...DEFAULT_ATLAS_STATE,
+    crossBridgeStep: Number.isFinite(crossBridgeStep)
+      ? Math.max(0, Math.round(crossBridgeStep))
+      : DEFAULT_ATLAS_STATE.crossBridgeStep,
     fiberType:
       fiberType === "type_I" ||
       fiberType === "type_IIa" ||
@@ -53,6 +67,9 @@ export function createAtlasStateFromSearch(search: string): AtlasState {
         : DEFAULT_ATLAS_STATE.fiberType,
     selectedMuscleId: muscle ?? DEFAULT_ATLAS_STATE.selectedMuscleId,
     selectedNodeId: node ?? DEFAULT_ATLAS_STATE.selectedNodeId,
+    sarcomereLengthUm: Number.isFinite(sarcomereLengthUm)
+      ? clampSarcomereLength(sarcomereLengthUm)
+      : DEFAULT_ATLAS_STATE.sarcomereLengthUm,
     zoomValue: Number.isFinite(zoom)
       ? clampZoom(zoom)
       : DEFAULT_ATLAS_STATE.zoomValue,
@@ -120,6 +137,18 @@ export function atlasReducer(
         selectedNodeId: `${state.selectedMuscleId}_myofibril`,
         zoomValue: LEVEL_ENTRY_ZOOM[7],
       };
+    case "select_sarcomere":
+      return {
+        ...state,
+        selectedNodeId: "rectus_femoris_sarcomere",
+        zoomValue: LEVEL_ENTRY_ZOOM[8],
+      };
+    case "select_filament":
+      return {
+        ...state,
+        selectedNodeId: action.filamentId,
+        zoomValue: LEVEL_ENTRY_ZOOM[9],
+      };
     case "select_region":
       return {
         ...state,
@@ -131,6 +160,16 @@ export function atlasReducer(
       return {
         ...state,
         fiberType: action.fiberType,
+      };
+    case "set_sarcomere_length":
+      return {
+        ...state,
+        sarcomereLengthUm: clampSarcomereLength(action.lengthUm),
+      };
+    case "set_cross_bridge_step":
+      return {
+        ...state,
+        crossBridgeStep: Math.max(0, Math.round(action.step)),
       };
     case "toggle_fascicle_cross_section":
       return {

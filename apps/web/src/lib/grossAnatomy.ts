@@ -391,11 +391,13 @@ export function getGrossBreadcrumbLabels(nodeId: string): string[] {
   const isFascicle = nodeId.endsWith("_fascicle");
   const isFiber = nodeId.endsWith("_fiber");
   const isMyofibril = nodeId.endsWith("_myofibril");
+  const isSarcomere = nodeId.endsWith("_sarcomere");
   const resolvedId = resolveMuscleId(
     nodeId
       .replace("_fascicle", "")
       .replace("_fiber", "")
-      .replace("_myofibril", ""),
+      .replace("_myofibril", "")
+      .replace("_sarcomere", ""),
   );
 
   if (
@@ -415,6 +417,10 @@ export function getGrossBreadcrumbLabels(nodeId: string): string[] {
 
     if (isMyofibril) {
       return [...labels, "Fascicle", "Fiber", "Myofibril"];
+    }
+
+    if (isSarcomere) {
+      return [...labels, "Fascicle", "Fiber", "Myofibril", "Sarcomere"];
     }
 
     return labels;

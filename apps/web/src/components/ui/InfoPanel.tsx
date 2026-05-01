@@ -16,12 +16,19 @@ import {
   getFiberOrganelleCounts,
   getFiberTypeProfile,
 } from "@/lib/microAnatomy";
+import {
+  calculateBandGeometry,
+  getCrossBridgeStep,
+  getLengthTensionForce,
+} from "@/lib/sarcomere";
 
 interface InfoPanelProps {
   activeLayer: GrossLayer;
+  crossBridgeStep: number;
   fiberType: FiberType;
   muscleId: string;
   nodeId: string;
+  sarcomereLengthUm: number;
 }
 
 function formatFiberTypes(muscleId: string): string {
@@ -36,15 +43,18 @@ function formatFiberTypes(muscleId: string): string {
 
 export default function InfoPanel({
   activeLayer,
+  crossBridgeStep,
   fiberType,
   muscleId,
   nodeId,
+  sarcomereLengthUm,
 }: InfoPanelProps) {
   const muscle = getMuscleDetail(muscleId);
   const layer = GROSS_LAYERS.find((item) => item.id === activeLayer);
   const isFascicleView = nodeId.endsWith("_fascicle");
   const isFiberView = nodeId.endsWith("_fiber");
   const isMyofibrilView = nodeId.endsWith("_myofibril");
+  const isSarcomereView = nodeId.endsWith("_sarcomere");
   const isMuscleView = nodeId === muscleId;
 
   if (isFascicleView) {
@@ -160,6 +170,54 @@ export default function InfoPanel({
           <div>
             <dt>Banding</dt>
             <dd>Repeating I-band and A-band pattern</dd>
+          </div>
+        </dl>
+      </section>
+    );
+  }
+
+  if (isSarcomereView) {
+    const bands = calculateBandGeometry(sarcomereLengthUm, fiberType);
+    const bridgeStep = getCrossBridgeStep(crossBridgeStep);
+    const force = getLengthTensionForce(sarcomereLengthUm);
+
+    return (
+      <section className="panel info-grid" aria-labelledby="info-panel-heading">
+        <h2 id="info-panel-heading">Sarcomere</h2>
+        <p>
+          Z-disc to Z-disc contractile unit with thick, thin, and titin
+          filaments.
+        </p>
+        <dl>
+          <div>
+            <dt>Sarcomere length</dt>
+            <dd>{bands.sarcomereLengthUm.toFixed(2)} um</dd>
+          </div>
+          <div>
+            <dt>A-band</dt>
+            <dd>
+              {bands.aBandWidthUm.toFixed(2)} um fixed thick-filament length
+            </dd>
+          </div>
+          <div>
+            <dt>I-band</dt>
+            <dd>{bands.iBandWidthUm.toFixed(2)} um total light band</dd>
+          </div>
+          <div>
+            <dt>H-zone</dt>
+            <dd>{bands.hZoneWidthUm.toFixed(2)} um thick-only zone</dd>
+          </div>
+          <div>
+            <dt>Titin stretch</dt>
+            <dd>{bands.titinExtensionUm.toFixed(2)} um Z-disc to M-line</dd>
+          </div>
+          <div>
+            <dt>Length tension</dt>
+            <dd>{Math.round(force * 100)}% relative active force</dd>
+          </div>
+          <div>
+            <dt>Cross-bridge</dt>
+            <dd>{bridgeStep.label}</dd>
           </div>
         </dl>
       </section>

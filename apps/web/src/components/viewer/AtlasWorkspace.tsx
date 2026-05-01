@@ -39,9 +39,11 @@ export default function AtlasWorkspace() {
         />
         <InfoPanel
           activeLayer={state.activeLayer}
+          crossBridgeStep={state.crossBridgeStep}
           fiberType={state.fiberType}
           muscleId={state.selectedMuscleId}
           nodeId={state.selectedNodeId}
+          sarcomereLengthUm={state.sarcomereLengthUm}
         />
         <MicroAnatomyControls dispatch={dispatch} state={state} />
         <LegendPanel />
