@@ -55,6 +55,7 @@ export default function L6Fiber({ dispatch, state }: GrossLevelProps) {
         onSelectMyofibril={() =>
           dispatch({ myofibrilId: "myofibril_1", type: "select_myofibril" })
         }
+        visibility={state.fiberVisibility}
       />
     </group>
   );

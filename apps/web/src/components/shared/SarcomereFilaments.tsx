@@ -1,5 +1,9 @@
 "use client";
 
+import type {
+  SarcomereStructureLayer,
+  StructureVisibility,
+} from "@/lib/atlasState";
 import {
   type BandGeometry,
   CROWN_SPACING_UM,
@@ -13,6 +17,7 @@ interface SarcomereFilamentsProps {
   bandGeometry: BandGeometry;
   crossBridgeStep: number;
   onSelectFilament: (filamentId: string) => void;
+  visibility: StructureVisibility<SarcomereStructureLayer>;
 }
 
 const SCENE_SCALE = 0.72;
@@ -195,7 +200,7 @@ function TitinFilaments({
 function S1Heads({
   bandGeometry,
   crossBridgeStep,
-}: Omit<SarcomereFilamentsProps, "onSelectFilament">) {
+}: Omit<SarcomereFilamentsProps, "onSelectFilament" | "visibility">) {
   const meshRef = useRef<InstancedMesh>(null);
   const step = getCrossBridgeStep(crossBridgeStep);
 
@@ -247,22 +252,34 @@ export default function SarcomereFilaments({
   bandGeometry,
   crossBridgeStep,
   onSelectFilament,
+  visibility,
 }: SarcomereFilamentsProps) {
   return (
     <group name="sarcomere-filament-lattice">
-      <TitinFilaments
-        bandGeometry={bandGeometry}
-        onSelectFilament={onSelectFilament}
-      />
-      <ThinFilaments
-        bandGeometry={bandGeometry}
-        onSelectFilament={onSelectFilament}
-      />
-      <ThickFilaments
-        bandGeometry={bandGeometry}
-        onSelectFilament={onSelectFilament}
-      />
-      <S1Heads bandGeometry={bandGeometry} crossBridgeStep={crossBridgeStep} />
+      {visibility.titin ? (
+        <TitinFilaments
+          bandGeometry={bandGeometry}
+          onSelectFilament={onSelectFilament}
+        />
+      ) : null}
+      {visibility.thin ? (
+        <ThinFilaments
+          bandGeometry={bandGeometry}
+          onSelectFilament={onSelectFilament}
+        />
+      ) : null}
+      {visibility.thick ? (
+        <>
+          <ThickFilaments
+            bandGeometry={bandGeometry}
+            onSelectFilament={onSelectFilament}
+          />
+          <S1Heads
+            bandGeometry={bandGeometry}
+            crossBridgeStep={crossBridgeStep}
+          />
+        </>
+      ) : null}
     </group>
   );
 }

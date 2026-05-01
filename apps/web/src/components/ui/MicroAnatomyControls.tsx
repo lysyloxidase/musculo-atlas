@@ -1,6 +1,10 @@
 "use client";
 
 import type { AtlasAction, AtlasState } from "@/lib/atlasState";
+import type {
+  FiberStructureLayer,
+  SarcomereStructureLayer,
+} from "@/lib/atlasState";
 import { FIBER_TYPE_PROFILES, type FiberType } from "@/lib/microAnatomy";
 import {
   CROSS_BRIDGE_CYCLE,
@@ -16,6 +20,19 @@ interface MicroAnatomyControlsProps {
 }
 
 const fiberTypes = Object.values(FIBER_TYPE_PROFILES);
+const fiberLayers: { id: FiberStructureLayer; label: string }[] = [
+  { id: "nuclei", label: "Nuclei" },
+  { id: "mitochondria", label: "Mito" },
+  { id: "sr", label: "SR" },
+  { id: "tTubules", label: "T-tubules" },
+];
+const sarcomereLayers: { id: SarcomereStructureLayer; label: string }[] = [
+  { id: "thick", label: "Thick" },
+  { id: "thin", label: "Thin" },
+  { id: "titin", label: "Titin" },
+  { id: "zDisc", label: "Z-disc" },
+  { id: "mLine", label: "M-line" },
+];
 
 export default function MicroAnatomyControls({
   dispatch,
@@ -46,22 +63,60 @@ export default function MicroAnatomyControls({
         </button>
       ) : null}
       {level === 6 ? (
-        <div className="fiber-type-toggle" aria-label="Fiber type toggle">
-          {fiberTypes.map((profile) => (
+        <>
+          <div className="fiber-type-toggle" aria-label="Fiber type toggle">
+            {fiberTypes.map((profile) => (
+              <button
+                aria-pressed={state.fiberType === profile.id}
+                key={profile.id}
+                onClick={() =>
+                  dispatch({
+                    fiberType: profile.id as FiberType,
+                    type: "set_fiber_type",
+                  })
+                }
+                title={profile.description}
+                type="button"
+              >
+                <span
+                  className="swatch"
+                  style={{ background: profile.color }}
+                />
+                {profile.label}
+              </button>
+            ))}
+          </div>
+          <div className="layer-chip-grid" aria-label="Fiber organelle layers">
+            {fiberLayers.map((layer) => (
+              <button
+                aria-pressed={state.fiberVisibility[layer.id]}
+                key={layer.id}
+                onClick={() =>
+                  dispatch({ layer: layer.id, type: "toggle_fiber_layer" })
+                }
+                type="button"
+              >
+                {layer.label}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : null}
+      {level === 8 ? (
+        <div className="layer-chip-grid" aria-label="Sarcomere filament layers">
+          {sarcomereLayers.map((layer) => (
             <button
-              aria-pressed={state.fiberType === profile.id}
-              key={profile.id}
+              aria-pressed={state.sarcomereVisibility[layer.id]}
+              key={layer.id}
               onClick={() =>
                 dispatch({
-                  fiberType: profile.id as FiberType,
-                  type: "set_fiber_type",
+                  layer: layer.id,
+                  type: "toggle_sarcomere_layer",
                 })
               }
-              title={profile.description}
               type="button"
             >
-              <span className="swatch" style={{ background: profile.color }} />
-              {profile.label}
+              {layer.label}
             </button>
           ))}
         </div>

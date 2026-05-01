@@ -1,18 +1,24 @@
-import { getGrossBreadcrumbLabels } from "@/lib/grossAnatomy";
+import { getBreadcrumbItems } from "@/lib/semanticZoom";
 
 interface BreadcrumbNavProps {
   nodeId: string;
+  onNavigate?: (nodeId: string) => void;
 }
 
-export default function BreadcrumbNav({ nodeId }: BreadcrumbNavProps) {
-  const breadcrumb = getGrossBreadcrumbLabels(nodeId);
+export default function BreadcrumbNav({
+  nodeId,
+  onNavigate,
+}: BreadcrumbNavProps) {
+  const breadcrumb = getBreadcrumbItems(nodeId);
 
   return (
     <nav aria-label="Anatomy breadcrumb" className="breadcrumb">
-      {breadcrumb.map((label, index) => (
-        <span key={label}>
+      {breadcrumb.map((item, index) => (
+        <span key={`${item.nodeId}-${item.label}`}>
           {index > 0 ? ">" : ""}
-          {label}
+          <button onClick={() => onNavigate?.(item.nodeId)} type="button">
+            {item.label}
+          </button>
         </span>
       ))}
     </nav>

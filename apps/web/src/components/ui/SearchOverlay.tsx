@@ -1,24 +1,21 @@
 "use client";
 
-import { HIERARCHY_NODES } from "@/lib/hierarchy";
+import { searchAtlas } from "@/lib/semanticZoom";
+import type { RefObject } from "react";
 import { useMemo, useState } from "react";
 
 interface SearchOverlayProps {
+  inputRef?: RefObject<HTMLInputElement | null>;
   onSelect?: (nodeId: string) => void;
 }
 
-export default function SearchOverlay({ onSelect }: SearchOverlayProps) {
+export default function SearchOverlay({
+  inputRef,
+  onSelect,
+}: SearchOverlayProps) {
   const [query, setQuery] = useState("");
   const results = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-
-    if (normalized.length < 2) {
-      return [];
-    }
-
-    return HIERARCHY_NODES.filter(
-      (node) => node.level <= 4 && node.name.toLowerCase().includes(normalized),
-    ).slice(0, 6);
+    return searchAtlas(query, 8);
   }, [query]);
 
   return (
@@ -27,6 +24,7 @@ export default function SearchOverlay({ onSelect }: SearchOverlayProps) {
         aria-label="Search structures"
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Search structure"
+        ref={inputRef}
         type="search"
         value={query}
       />
@@ -34,8 +32,14 @@ export default function SearchOverlay({ onSelect }: SearchOverlayProps) {
         <ul className="search-results">
           {results.map((node) => (
             <li key={node.id}>
-              <button onClick={() => onSelect?.(node.id)} type="button">
-                L{node.level} - {node.name}
+              <button
+                onClick={() => {
+                  onSelect?.(node.id);
+                  setQuery("");
+                }}
+                type="button"
+              >
+                L{node.level} - {node.label}
               </button>
             </li>
           ))}

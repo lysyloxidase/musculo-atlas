@@ -1,5 +1,9 @@
 "use client";
 
+import type {
+  FiberStructureLayer,
+  StructureVisibility,
+} from "@/lib/atlasState";
 import {
   type FiberType,
   getFiberOrganelleCounts,
@@ -17,6 +21,7 @@ import {
 interface FiberOrganellesProps {
   fiberType: FiberType;
   onSelectMyofibril: () => void;
+  visibility: StructureVisibility<FiberStructureLayer>;
 }
 
 function PeripheralNuclei({ fiberType }: { fiberType: FiberType }) {
@@ -293,6 +298,7 @@ function LipidDroplets({ fiberType }: { fiberType: FiberType }) {
 export default function FiberOrganelles({
   fiberType,
   onSelectMyofibril,
+  visibility,
 }: FiberOrganellesProps) {
   const profile = getFiberTypeProfile(fiberType);
 
@@ -305,10 +311,10 @@ export default function FiberOrganelles({
         fiberType={fiberType}
         onSelectMyofibril={onSelectMyofibril}
       />
-      <TTubules fiberType={fiberType} />
-      <SarcoplasmicReticulum fiberType={fiberType} />
-      <Mitochondria fiberType={fiberType} />
-      <PeripheralNuclei fiberType={fiberType} />
+      {visibility.tTubules ? <TTubules fiberType={fiberType} /> : null}
+      {visibility.sr ? <SarcoplasmicReticulum fiberType={fiberType} /> : null}
+      {visibility.mitochondria ? <Mitochondria fiberType={fiberType} /> : null}
+      {visibility.nuclei ? <PeripheralNuclei fiberType={fiberType} /> : null}
       <SatelliteCells fiberType={fiberType} />
       <GlycogenPointCloud fiberType={fiberType} />
       <LipidDroplets fiberType={fiberType} />

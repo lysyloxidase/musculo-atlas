@@ -1,7 +1,8 @@
 "use client";
 
 import { atlasReducer, createAtlasStateFromSearch } from "@/lib/atlasState";
-import { useReducer } from "react";
+import type { ZoomLevel } from "@/lib/types";
+import { useEffect, useReducer, useRef } from "react";
 import BreadcrumbNav from "../ui/BreadcrumbNav";
 import InfoPanel from "../ui/InfoPanel";
 import LayerToggle from "../ui/LayerToggle";
@@ -13,25 +14,85 @@ import ZoomIndicator from "../ui/ZoomIndicator";
 import AtlasCanvas from "./AtlasCanvas";
 
 export default function AtlasWorkspace() {
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [state, dispatch] = useReducer(atlasReducer, "", () =>
     createAtlasStateFromSearch(
       typeof window === "undefined" ? "" : window.location.search,
     ),
   );
 
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const nowMs = performance.now();
+
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+        return;
+      }
+
+      if (event.key === "Escape") {
+        dispatch({ nowMs, type: "zoom_out" });
+        return;
+      }
+
+      if (event.key === " ") {
+        event.preventDefault();
+        dispatch({ type: "toggle_animation" });
+        return;
+      }
+
+      const digitLevel =
+        event.key === "0"
+          ? 10
+          : Number.isInteger(Number(event.key))
+            ? Number(event.key)
+            : null;
+
+      if (digitLevel && digitLevel >= 1 && digitLevel <= 10) {
+        dispatch({
+          level: digitLevel as ZoomLevel,
+          nowMs,
+          type: "jump_level",
+        });
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <main className="atlas-shell">
       <div className="atlas-topbar">
-        <BreadcrumbNav nodeId={state.selectedNodeId} />
+        <BreadcrumbNav
+          nodeId={state.selectedNodeId}
+          onNavigate={(nodeId) =>
+            dispatch({
+              nodeId,
+              nowMs: performance.now(),
+              type: "navigate_to_node",
+            })
+          }
+        />
         <SearchOverlay
+          inputRef={searchInputRef}
           onSelect={(nodeId) =>
-            dispatch({ muscleId: nodeId, type: "select_muscle" })
+            dispatch({
+              nodeId,
+              nowMs: performance.now(),
+              type: "navigate_to_node",
+            })
           }
         />
       </div>
       <section className="atlas-stage" aria-label="MusculoAtlas viewer">
         <AtlasCanvas dispatch={dispatch} state={state} />
-        <ZoomIndicator zoomValue={state.zoomValue} />
+        <ZoomIndicator
+          nodeId={state.selectedNodeId}
+          zoomValue={state.zoomValue}
+        />
       </section>
       <aside className="atlas-side">
         <LayerToggle

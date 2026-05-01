@@ -205,6 +205,18 @@ h1 {
   color: var(--text);
 }
 
+.breadcrumb button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.breadcrumb button:hover {
+  color: var(--teal);
+}
+
 .search {
   position: relative;
   width: min(340px, 40vw);
@@ -246,23 +258,89 @@ h1 {
   background: rgb(255 255 255 / 8%);
 }
 
-.zoom-hud {
+.scale-hud,
+.level-badge,
+.zoom-minimap {
   position: absolute;
-  right: 16px;
-  bottom: 16px;
-  display: grid;
-  gap: 8px;
+  z-index: 3;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 10px;
   background: rgb(23 23 23 / 82%);
 }
 
-.scale-bar {
+.scale-hud {
+  bottom: 16px;
+  left: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.scale-line {
   width: 160px;
   height: 6px;
   border-radius: 99px;
   background: linear-gradient(90deg, var(--teal), var(--gold), var(--coral));
+}
+
+.level-badge {
+  top: 16px;
+  right: 16px;
+  display: grid;
+  min-width: 220px;
+  gap: 4px;
+  animation: badge-slide 300ms ease-out;
+}
+
+.level-badge span,
+.scale-hud span {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.zoom-minimap {
+  right: 16px;
+  bottom: 16px;
+  left: min(360px, 34vw);
+  padding: 14px 18px 22px;
+}
+
+.minimap-track {
+  position: relative;
+  height: 8px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--teal), var(--gold), var(--coral));
+}
+
+.minimap-tick {
+  position: absolute;
+  top: 12px;
+  translate: -50% 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.minimap-position {
+  position: absolute;
+  top: -4px;
+  width: 12px;
+  height: 16px;
+  border: 2px solid var(--text);
+  border-radius: 4px;
+  background: rgb(23 23 23 / 84%);
+  translate: -50% 0;
+}
+
+@keyframes badge-slide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .canvas-controls {
@@ -341,6 +419,12 @@ h1 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
+}
+
+.layer-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
 }
 
 .sarcomere-controls {
@@ -487,5 +571,27 @@ h1 {
 
   .search {
     width: 100%;
+  }
+
+  .level-badge {
+    right: 16px;
+    left: 154px;
+    min-width: 0;
+  }
+
+  .scale-hud {
+    right: auto;
+    bottom: 72px;
+    left: 16px;
+  }
+
+  .scale-line {
+    width: 160px;
+  }
+
+  .zoom-minimap {
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
   }
 }

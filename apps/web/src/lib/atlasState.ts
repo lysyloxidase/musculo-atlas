@@ -1,4 +1,6 @@
 import type { GrossLayer } from "./grossAnatomy";
+import { getMuscleDetail, resolveMuscleId } from "./grossAnatomy";
+import { HIERARCHY_BY_ID } from "./hierarchy";
 import type { FiberType } from "./microAnatomy";
 import {
   type DomainId,
@@ -8,12 +10,36 @@ import {
   getDefaultDomainForProtein,
   getDomainStructure,
   isDomainId,
+  isProteinId,
   parseMolecularRenderMode,
   parseTroponinState,
   resolveProteinIdFromFilament,
 } from "./molecular";
 import { clampSarcomereLength } from "./sarcomere";
+import {
+  LEVEL_ENTRY_ZOOM,
+  type ZoomTransition,
+  applyScrollZoom,
+  createZoomTransition,
+  getAdjacentLevelForDoubleClick,
+  getAdjacentLevelForEscape,
+  getBreadcrumbItems,
+} from "./semanticZoom";
 import type { ZoomLevel } from "./types";
+import { getZoomLevel } from "./zoom";
+
+export { LEVEL_ENTRY_ZOOM } from "./semanticZoom";
+
+export type FiberStructureLayer = "nuclei" | "mitochondria" | "sr" | "tTubules";
+
+export type SarcomereStructureLayer =
+  | "thick"
+  | "thin"
+  | "titin"
+  | "zDisc"
+  | "mLine";
+
+export type StructureVisibility<T extends string> = Record<T, boolean>;
 
 export interface AtlasState {
   activeLayer: GrossLayer;
@@ -21,8 +47,11 @@ export interface AtlasState {
   crossBridgeStep: number;
   fascicleCrossSection: boolean;
   fiberType: FiberType;
+  fiberVisibility: StructureVisibility<FiberStructureLayer>;
+  isAnimationPlaying: boolean;
   molecularRenderMode: MolecularRenderMode;
   sarcomereLengthUm: number;
+  sarcomereVisibility: StructureVisibility<SarcomereStructureLayer>;
   selectedAtomId: string | null;
   selectedDomainId: DomainId;
   selectedFiberId: string;
@@ -31,27 +60,36 @@ export interface AtlasState {
   selectedProteinId: ProteinId;
   troponinState: TroponinState;
   zoomValue: number;
+  zoomTransition: ZoomTransition | null;
 }
 
 export type AtlasAction =
-  | { type: "zoom"; value: number }
-  | { type: "select_body_region"; regionId: string }
+  | { type: "zoom"; value: number; nowMs?: number }
+  | { type: "semantic_scroll"; deltaY: number; fine?: boolean; nowMs?: number }
+  | { type: "jump_level"; level: ZoomLevel; nowMs?: number }
+  | { type: "zoom_out"; nowMs?: number }
+  | { type: "double_click_selected"; nowMs?: number }
+  | { type: "navigate_to_node"; nodeId: string; nowMs?: number }
+  | { type: "select_body_region"; regionId: string; nowMs?: number }
   | { type: "select_layer"; layer: GrossLayer }
-  | { type: "select_region"; regionId: string }
-  | { type: "select_muscle"; muscleId: string }
-  | { type: "select_muscle_belly"; muscleId: string }
-  | { type: "select_fiber"; fiberId: string }
-  | { type: "select_myofibril"; myofibrilId: string }
-  | { type: "select_sarcomere"; sarcomereId: string }
-  | { type: "select_filament"; filamentId: string }
-  | { type: "select_protein"; proteinId: ProteinId }
-  | { type: "select_domain"; domainId: DomainId }
+  | { type: "select_region"; regionId: string; nowMs?: number }
+  | { type: "select_muscle"; muscleId: string; nowMs?: number }
+  | { type: "select_muscle_belly"; muscleId: string; nowMs?: number }
+  | { type: "select_fiber"; fiberId: string; nowMs?: number }
+  | { type: "select_myofibril"; myofibrilId: string; nowMs?: number }
+  | { type: "select_sarcomere"; sarcomereId: string; nowMs?: number }
+  | { type: "select_filament"; filamentId: string; nowMs?: number }
+  | { type: "select_protein"; proteinId: ProteinId; nowMs?: number }
+  | { type: "select_domain"; domainId: DomainId; nowMs?: number }
   | { type: "select_atom"; atomId: string }
   | { type: "set_fiber_type"; fiberType: FiberType }
   | { type: "set_sarcomere_length"; lengthUm: number }
   | { type: "set_cross_bridge_step"; step: number }
   | { type: "set_molecular_render_mode"; mode: MolecularRenderMode }
   | { type: "set_troponin_state"; state: TroponinState }
+  | { type: "toggle_animation" }
+  | { type: "toggle_fiber_layer"; layer: FiberStructureLayer }
+  | { type: "toggle_sarcomere_layer"; layer: SarcomereStructureLayer }
   | { type: "toggle_fascicle_cross_section" };
 
 export const DEFAULT_ATLAS_STATE: AtlasState = {
@@ -60,8 +98,22 @@ export const DEFAULT_ATLAS_STATE: AtlasState = {
   crossBridgeStep: 0,
   fascicleCrossSection: true,
   fiberType: "type_I",
+  fiberVisibility: {
+    mitochondria: true,
+    nuclei: true,
+    sr: true,
+    tTubules: true,
+  },
+  isAnimationPlaying: true,
   molecularRenderMode: "surface",
   sarcomereLengthUm: 2.4,
+  sarcomereVisibility: {
+    mLine: true,
+    thick: true,
+    thin: true,
+    titin: true,
+    zDisc: true,
+  },
   selectedAtomId: null,
   selectedDomainId: "titin_ig_domain",
   selectedFiberId: "fiber_1",
@@ -70,6 +122,7 @@ export const DEFAULT_ATLAS_STATE: AtlasState = {
   selectedProteinId: "titin",
   troponinState: "blocked",
   zoomValue: 0,
+  zoomTransition: null,
 };
 
 export function createAtlasStateFromSearch(search: string): AtlasState {
@@ -124,24 +177,161 @@ export function createAtlasStateFromSearch(search: string): AtlasState {
     zoomValue: Number.isFinite(zoom)
       ? clampZoom(zoom)
       : DEFAULT_ATLAS_STATE.zoomValue,
+    zoomTransition: null,
   };
 }
 
-export const LEVEL_ENTRY_ZOOM: Record<ZoomLevel, number> = {
-  1: 0,
-  2: 0.12,
-  3: 0.24,
-  4: 0.34,
-  5: 0.46,
-  6: 0.56,
-  7: 0.66,
-  8: 0.76,
-  9: 0.86,
-  10: 0.96,
-};
-
 function clampZoom(value: number): number {
   return Math.min(1, Math.max(0, value));
+}
+
+function withZoomTransition(
+  state: AtlasState,
+  nextState: AtlasState,
+  nextZoom: number,
+  nowMs?: number,
+): AtlasState {
+  const zoomValue = clampZoom(nextZoom);
+
+  return {
+    ...nextState,
+    zoomTransition: createZoomTransition(
+      state.zoomValue,
+      zoomValue,
+      getNowMs(nowMs),
+    ),
+    zoomValue,
+  };
+}
+
+function getNowMs(nowMs?: number): number {
+  if (typeof nowMs === "number") {
+    return nowMs;
+  }
+
+  if (typeof performance !== "undefined") {
+    return performance.now();
+  }
+
+  return Date.now();
+}
+
+function navigateToNode(
+  state: AtlasState,
+  nodeId: string,
+  nowMs?: number,
+): AtlasState {
+  if (nodeId === "body") {
+    return withZoomTransition(
+      state,
+      { ...state, selectedNodeId: "body" },
+      LEVEL_ENTRY_ZOOM[1],
+      nowMs,
+    );
+  }
+
+  if (isProteinId(nodeId)) {
+    return withZoomTransition(
+      state,
+      {
+        ...state,
+        selectedDomainId: getDefaultDomainForProtein(nodeId),
+        selectedNodeId: nodeId,
+        selectedProteinId: nodeId,
+      },
+      LEVEL_ENTRY_ZOOM[9],
+      nowMs,
+    );
+  }
+
+  if (isDomainId(nodeId)) {
+    const domain = getDomainStructure(nodeId);
+
+    return withZoomTransition(
+      state,
+      {
+        ...state,
+        selectedAtomId: null,
+        selectedDomainId: nodeId,
+        selectedNodeId: nodeId,
+        selectedProteinId: domain.proteinId,
+      },
+      LEVEL_ENTRY_ZOOM[10],
+      nowMs,
+    );
+  }
+
+  const node = HIERARCHY_BY_ID.get(nodeId);
+
+  if (node) {
+    const nextState: AtlasState = {
+      ...state,
+      selectedNodeId: node.id,
+    };
+
+    if (node.level === 3) {
+      nextState.activeRegionId = node.id;
+    }
+
+    if (node.level === 4) {
+      nextState.selectedMuscleId = node.id;
+    }
+
+    return withZoomTransition(
+      state,
+      nextState,
+      LEVEL_ENTRY_ZOOM[node.level],
+      nowMs,
+    );
+  }
+
+  const muscleId = resolveMuscleId(nodeId);
+
+  try {
+    getMuscleDetail(muscleId);
+
+    return withZoomTransition(
+      state,
+      {
+        ...state,
+        selectedMuscleId: muscleId,
+        selectedNodeId: muscleId,
+      },
+      LEVEL_ENTRY_ZOOM[4],
+      nowMs,
+    );
+  } catch {
+    return state;
+  }
+}
+
+function zoomOut(state: AtlasState, nowMs?: number): AtlasState {
+  const breadcrumb = getBreadcrumbItems(state.selectedNodeId);
+  const previous = breadcrumb.at(-2);
+
+  if (previous) {
+    return navigateToNode(state, previous.nodeId, nowMs);
+  }
+
+  const targetLevel = getAdjacentLevelForEscape(getZoomLevel(state.zoomValue));
+
+  return withZoomTransition(state, state, LEVEL_ENTRY_ZOOM[targetLevel], nowMs);
+}
+
+function doubleClickSelected(state: AtlasState, nowMs?: number): AtlasState {
+  const level = getZoomLevel(state.zoomValue);
+
+  if (level === 8) {
+    return atlasReducer(state, {
+      filamentId: "myosin_ii",
+      nowMs,
+      type: "select_filament",
+    });
+  }
+
+  const targetLevel = getAdjacentLevelForDoubleClick(level);
+
+  return withZoomTransition(state, state, LEVEL_ENTRY_ZOOM[targetLevel], nowMs);
 }
 
 export function atlasReducer(
@@ -149,91 +339,153 @@ export function atlasReducer(
   action: AtlasAction,
 ): AtlasState {
   switch (action.type) {
+    case "semantic_scroll": {
+      const zoomValue = applyScrollZoom(
+        state.zoomValue,
+        action.deltaY,
+        action.fine,
+      );
+
+      return withZoomTransition(state, state, zoomValue, action.nowMs);
+    }
+    case "jump_level":
+      return withZoomTransition(
+        state,
+        state,
+        LEVEL_ENTRY_ZOOM[action.level],
+        action.nowMs,
+      );
+    case "zoom_out":
+      return zoomOut(state, action.nowMs);
+    case "double_click_selected":
+      return doubleClickSelected(state, action.nowMs);
+    case "navigate_to_node":
+      return navigateToNode(state, action.nodeId, action.nowMs);
     case "select_body_region":
-      return {
-        ...state,
-        activeRegionId: action.regionId,
-        selectedNodeId: "musculoskeletal_system",
-        zoomValue: LEVEL_ENTRY_ZOOM[2],
-      };
+      return withZoomTransition(
+        state,
+        {
+          ...state,
+          activeRegionId: action.regionId,
+          selectedNodeId: "musculoskeletal_system",
+        },
+        LEVEL_ENTRY_ZOOM[2],
+        action.nowMs,
+      );
     case "select_layer":
       return {
         ...state,
         activeLayer: action.layer,
       };
     case "select_muscle":
-      return {
-        ...state,
-        selectedMuscleId: action.muscleId,
-        selectedNodeId: action.muscleId,
-        zoomValue: LEVEL_ENTRY_ZOOM[4],
-      };
+      return withZoomTransition(
+        state,
+        {
+          ...state,
+          selectedMuscleId: action.muscleId,
+          selectedNodeId: action.muscleId,
+        },
+        LEVEL_ENTRY_ZOOM[4],
+        action.nowMs,
+      );
     case "select_muscle_belly":
-      return {
-        ...state,
-        selectedMuscleId: action.muscleId,
-        selectedNodeId: `${action.muscleId}_fascicle`,
-        zoomValue: LEVEL_ENTRY_ZOOM[5],
-      };
+      return withZoomTransition(
+        state,
+        {
+          ...state,
+          selectedMuscleId: action.muscleId,
+          selectedNodeId: `${action.muscleId}_fascicle`,
+        },
+        LEVEL_ENTRY_ZOOM[5],
+        action.nowMs,
+      );
     case "select_fiber":
-      return {
-        ...state,
-        selectedFiberId: action.fiberId,
-        selectedNodeId: `${state.selectedMuscleId}_fiber`,
-        zoomValue: LEVEL_ENTRY_ZOOM[6],
-      };
+      return withZoomTransition(
+        state,
+        {
+          ...state,
+          selectedFiberId: action.fiberId,
+          selectedNodeId: `${state.selectedMuscleId}_fiber`,
+        },
+        LEVEL_ENTRY_ZOOM[6],
+        action.nowMs,
+      );
     case "select_myofibril":
-      return {
-        ...state,
-        selectedNodeId: `${state.selectedMuscleId}_myofibril`,
-        zoomValue: LEVEL_ENTRY_ZOOM[7],
-      };
+      return withZoomTransition(
+        state,
+        {
+          ...state,
+          selectedNodeId: `${state.selectedMuscleId}_myofibril`,
+        },
+        LEVEL_ENTRY_ZOOM[7],
+        action.nowMs,
+      );
     case "select_sarcomere":
-      return {
-        ...state,
-        selectedNodeId: "rectus_femoris_sarcomere",
-        zoomValue: LEVEL_ENTRY_ZOOM[8],
-      };
+      return withZoomTransition(
+        state,
+        {
+          ...state,
+          selectedNodeId: "rectus_femoris_sarcomere",
+        },
+        LEVEL_ENTRY_ZOOM[8],
+        action.nowMs,
+      );
     case "select_filament": {
       const proteinId = resolveProteinIdFromFilament(action.filamentId);
 
-      return {
-        ...state,
-        selectedDomainId: getDefaultDomainForProtein(proteinId),
-        selectedNodeId: proteinId,
-        selectedProteinId: proteinId,
-        zoomValue: LEVEL_ENTRY_ZOOM[9],
-      };
+      return withZoomTransition(
+        state,
+        {
+          ...state,
+          selectedDomainId: getDefaultDomainForProtein(proteinId),
+          selectedNodeId: proteinId,
+          selectedProteinId: proteinId,
+        },
+        LEVEL_ENTRY_ZOOM[9],
+        action.nowMs,
+      );
     }
     case "select_protein":
-      return {
-        ...state,
-        selectedDomainId: getDefaultDomainForProtein(action.proteinId),
-        selectedNodeId: action.proteinId,
-        selectedProteinId: action.proteinId,
-        zoomValue: LEVEL_ENTRY_ZOOM[9],
-      };
+      return withZoomTransition(
+        state,
+        {
+          ...state,
+          selectedDomainId: getDefaultDomainForProtein(action.proteinId),
+          selectedNodeId: action.proteinId,
+          selectedProteinId: action.proteinId,
+        },
+        LEVEL_ENTRY_ZOOM[9],
+        action.nowMs,
+      );
     case "select_domain":
-      return {
-        ...state,
-        selectedAtomId: null,
-        selectedDomainId: action.domainId,
-        selectedNodeId: action.domainId,
-        selectedProteinId: getDomainStructure(action.domainId).proteinId,
-        zoomValue: LEVEL_ENTRY_ZOOM[10],
-      };
+      return withZoomTransition(
+        state,
+        {
+          ...state,
+          selectedAtomId: null,
+          selectedDomainId: action.domainId,
+          selectedNodeId: action.domainId,
+          selectedProteinId: getDomainStructure(action.domainId).proteinId,
+        },
+        LEVEL_ENTRY_ZOOM[10],
+        action.nowMs,
+      );
     case "select_atom":
       return {
         ...state,
         selectedAtomId: action.atomId,
       };
     case "select_region":
-      return {
-        ...state,
-        activeRegionId: action.regionId,
-        selectedNodeId: action.regionId,
-        zoomValue: LEVEL_ENTRY_ZOOM[3],
-      };
+      return withZoomTransition(
+        state,
+        {
+          ...state,
+          activeRegionId: action.regionId,
+          selectedNodeId: action.regionId,
+        },
+        LEVEL_ENTRY_ZOOM[3],
+        action.nowMs,
+      );
     case "set_fiber_type":
       return {
         ...state,
@@ -264,11 +516,34 @@ export function atlasReducer(
         ...state,
         fascicleCrossSection: !state.fascicleCrossSection,
       };
-    case "zoom":
+    case "toggle_animation":
       return {
         ...state,
-        zoomValue: clampZoom(action.value),
+        isAnimationPlaying: !state.isAnimationPlaying,
       };
+    case "toggle_fiber_layer":
+      return {
+        ...state,
+        fiberVisibility: {
+          ...state.fiberVisibility,
+          [action.layer]: !state.fiberVisibility[action.layer],
+        },
+      };
+    case "toggle_sarcomere_layer":
+      return {
+        ...state,
+        sarcomereVisibility: {
+          ...state.sarcomereVisibility,
+          [action.layer]: !state.sarcomereVisibility[action.layer],
+        },
+      };
+    case "zoom":
+      return withZoomTransition(
+        state,
+        state,
+        clampZoom(action.value),
+        action.nowMs,
+      );
     default:
       return state;
   }

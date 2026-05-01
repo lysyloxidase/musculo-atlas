@@ -47,47 +47,57 @@ export default function L8Sarcomere({ dispatch, state }: GrossLevelProps) {
         thickFilamentLengthUm: bands.thickFilamentLengthUm,
       }}
     >
-      <mesh position={[bands.zLeftUm * SCENE_SCALE, 0, 0]}>
-        <boxGeometry
-          args={[
-            Math.max(0.012, bands.zDiscThicknessUm * SCENE_SCALE),
-            0.72,
-            0.12,
-          ]}
-        />
-        <meshStandardMaterial
-          color="#f4f1ea"
-          opacity={0.62}
-          roughness={0.5}
-          transparent
-        />
-      </mesh>
-      <mesh position={[bands.zRightUm * SCENE_SCALE, 0, 0]}>
-        <boxGeometry
-          args={[
-            Math.max(0.012, bands.zDiscThicknessUm * SCENE_SCALE),
-            0.72,
-            0.12,
-          ]}
-        />
-        <meshStandardMaterial
-          color="#f4f1ea"
-          opacity={0.62}
-          roughness={0.5}
-          transparent
-        />
-      </mesh>
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry
-          args={[Math.max(0.01, bands.mLineWidthUm * SCENE_SCALE), 0.62, 0.08]}
-        />
-        <meshStandardMaterial
-          color="#d7b95d"
-          opacity={0.55}
-          roughness={0.45}
-          transparent
-        />
-      </mesh>
+      {state.sarcomereVisibility.zDisc ? (
+        <>
+          <mesh position={[bands.zLeftUm * SCENE_SCALE, 0, 0]}>
+            <boxGeometry
+              args={[
+                Math.max(0.012, bands.zDiscThicknessUm * SCENE_SCALE),
+                0.72,
+                0.12,
+              ]}
+            />
+            <meshStandardMaterial
+              color="#f4f1ea"
+              opacity={0.62}
+              roughness={0.5}
+              transparent
+            />
+          </mesh>
+          <mesh position={[bands.zRightUm * SCENE_SCALE, 0, 0]}>
+            <boxGeometry
+              args={[
+                Math.max(0.012, bands.zDiscThicknessUm * SCENE_SCALE),
+                0.72,
+                0.12,
+              ]}
+            />
+            <meshStandardMaterial
+              color="#f4f1ea"
+              opacity={0.62}
+              roughness={0.5}
+              transparent
+            />
+          </mesh>
+        </>
+      ) : null}
+      {state.sarcomereVisibility.mLine ? (
+        <mesh position={[0, 0, 0]}>
+          <boxGeometry
+            args={[
+              Math.max(0.01, bands.mLineWidthUm * SCENE_SCALE),
+              0.62,
+              0.08,
+            ]}
+          />
+          <meshStandardMaterial
+            color="#d7b95d"
+            opacity={0.55}
+            roughness={0.45}
+            transparent
+          />
+        </mesh>
+      ) : null}
       <UmBand
         color="#d84d75"
         lengthUm={bands.aBandWidthUm}
@@ -123,6 +133,7 @@ export default function L8Sarcomere({ dispatch, state }: GrossLevelProps) {
         onSelectFilament={(filamentId) =>
           dispatch({ filamentId, type: "select_filament" })
         }
+        visibility={state.sarcomereVisibility}
       />
       {[-1, 1].map((side) => (
         <mesh
