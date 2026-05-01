@@ -1,0 +1,16 @@
+{
+  "name": "musculo-atlas",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "biome": "biome check .",
+    "ci": "pnpm biome && pnpm typecheck && pnpm test",
+    "format": "biome check --write .",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4"
+  }
+}

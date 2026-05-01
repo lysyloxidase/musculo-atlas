@@ -1,0 +1,13 @@
+[project]
+name = "ma-pipeline"
+version = "0.1.0"
+description = "Mesh, ontology, muscle catalog, and PDB ingestion tools for MusculoAtlas."
+requires-python = ">=3.12"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ma_pipeline"]

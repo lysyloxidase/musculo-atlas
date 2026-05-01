@@ -1,0 +1,32 @@
+{
+  "source": "Standring, Gray's Anatomy regional compartment organization",
+  "regions": [
+    {
+      "id": "lower_limb",
+      "name": "Lower limb",
+      "compartments": [
+        "anterior_thigh",
+        "posterior_thigh",
+        "medial_thigh",
+        "anterior_leg",
+        "lateral_leg",
+        "posterior_leg"
+      ]
+    },
+    {
+      "id": "upper_limb",
+      "name": "Upper limb",
+      "compartments": [
+        "anterior_arm",
+        "posterior_arm",
+        "anterior_forearm",
+        "posterior_forearm"
+      ]
+    },
+    {
+      "id": "trunk",
+      "name": "Trunk",
+      "compartments": ["gluteal", "abdominal_wall", "back"]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+services:
+  api:
+    build:
+      context: ./apps/api
+    ports:
+      - "8000:8000"
+  web:
+    command: pnpm dev --hostname 0.0.0.0
+    depends_on:
+      - api
+    image: node:24-alpine
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web:/app
+    working_dir: /app

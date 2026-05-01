@@ -1,0 +1,16 @@
+{
+  "adult_count": 206,
+  "source": "Gray's Anatomy adult skeleton count",
+  "groups": [
+    {
+      "id": "axial_skeleton",
+      "name": "Axial skeleton",
+      "count": 80
+    },
+    {
+      "id": "appendicular_skeleton",
+      "name": "Appendicular skeleton",
+      "count": 126
+    }
+  ]
+}

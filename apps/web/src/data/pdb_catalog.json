@@ -1,0 +1,82 @@
+[
+  {
+    "protein": "myosin_ii",
+    "display_name": "Myosin II",
+    "pdb_ids": ["2MYS", "5N69", "8G4L", "1BR1", "3I5G"],
+    "level": 9,
+    "description": "Skeletal muscle type-II myosin motor and thick-filament structural references.",
+    "source": "RCSB PDB and project research brief canonical myosin set"
+  },
+  {
+    "protein": "actin",
+    "display_name": "Actin",
+    "pdb_ids": ["3MFP", "1ATN", "6KN8"],
+    "level": 9,
+    "description": "G-actin, actin filament, and regulated thin-filament structural references.",
+    "source": "RCSB PDB and project research brief canonical actin set"
+  },
+  {
+    "protein": "titin",
+    "display_name": "Titin",
+    "pdb_ids": ["1TIT", "1TIU", "3B43", "1YA5"],
+    "level": 9,
+    "description": "Titin Ig and elastic-region domain structures.",
+    "source": "RCSB PDB and project research brief canonical titin set"
+  },
+  {
+    "protein": "tropomyosin",
+    "display_name": "Tropomyosin",
+    "pdb_ids": ["5JLH", "5NOG", "5NOL"],
+    "level": 9,
+    "description": "Thin-filament tropomyosin dimer and regulatory filament structures.",
+    "source": "RCSB PDB and project research brief canonical tropomyosin set"
+  },
+  {
+    "protein": "troponin",
+    "display_name": "Troponin",
+    "pdb_ids": ["6KN8", "6KLN"],
+    "level": 9,
+    "description": "Troponin-containing regulated thin-filament structures.",
+    "source": "RCSB PDB and project research brief canonical troponin set"
+  },
+  {
+    "protein": "nebulin",
+    "display_name": "Nebulin",
+    "pdb_ids": ["7QIM"],
+    "level": 9,
+    "description": "Thin-filament-associated nebulin structural reference.",
+    "source": "RCSB PDB and project research brief canonical nebulin set"
+  },
+  {
+    "protein": "alpha_actinin_2",
+    "display_name": "Alpha-actinin-2",
+    "pdb_ids": ["4D1E"],
+    "level": 9,
+    "description": "Z-disc alpha-actinin-2 structural reference.",
+    "source": "RCSB PDB and project research brief canonical alpha-actinin set"
+  },
+  {
+    "protein": "serca",
+    "display_name": "SERCA",
+    "pdb_ids": ["1SU4", "3TLM"],
+    "level": 9,
+    "description": "Sarcoplasmic reticulum calcium ATPase conformational references.",
+    "source": "RCSB PDB and project research brief canonical SERCA set"
+  },
+  {
+    "protein": "ryr1",
+    "display_name": "RyR1",
+    "pdb_ids": ["5T15", "7M6L"],
+    "level": 9,
+    "description": "Ryanodine receptor 1 calcium-release channel structures.",
+    "source": "RCSB PDB and project research brief canonical RyR1 set"
+  },
+  {
+    "protein": "titin_ig_domain",
+    "display_name": "Titin Ig domain",
+    "pdb_ids": ["1TIT"],
+    "level": 10,
+    "description": "Atomic-detail titin immunoglobulin-like beta-sandwich domain.",
+    "source": "RCSB PDB 1TIT and project research brief L10 domain specification"
+  }
+]

@@ -1,0 +1,15 @@
+name: Rust
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  mesh-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --manifest-path packages/mesh-tools-rs/Cargo.toml

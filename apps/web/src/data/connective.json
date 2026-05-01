@@ -1,0 +1,30 @@
+{
+  "source": "Gillies and Lieber 2011 skeletal muscle extracellular matrix; Standring, Gray's Anatomy connective tissues",
+  "structures": [
+    {
+      "id": "tendon",
+      "name": "Tendon",
+      "role": "Transmits muscle force to bone through dense regular collagen."
+    },
+    {
+      "id": "ligament",
+      "name": "Ligament",
+      "role": "Constrains joint motion through dense collagen bands."
+    },
+    {
+      "id": "epimysium",
+      "name": "Epimysium",
+      "role": "Surrounds whole skeletal muscles."
+    },
+    {
+      "id": "perimysium",
+      "name": "Perimysium",
+      "role": "Wraps fascicles and mediates lateral force transmission."
+    },
+    {
+      "id": "endomysium",
+      "name": "Endomysium",
+      "role": "Surrounds individual muscle fibers."
+    }
+  ]
+}

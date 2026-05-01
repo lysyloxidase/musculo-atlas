@@ -1,0 +1,8 @@
+[package]
+name = "mesh-tools-rs"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "mesh_tools_rs"
+path = "src/lib.rs"
