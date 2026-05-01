@@ -7,9 +7,19 @@ import {
   hasCompleteMuscleMetadata,
 } from "@/lib/grossAnatomy";
 import { getNode } from "@/lib/hierarchy";
+import {
+  DEFAULT_FASCICLE_CONFIG,
+  type FiberType,
+  SARCOLEMMA_THICKNESS_NM,
+  T_TUBULE_LUMEN_NM,
+  T_TUBULE_SPACING_UM,
+  getFiberOrganelleCounts,
+  getFiberTypeProfile,
+} from "@/lib/microAnatomy";
 
 interface InfoPanelProps {
   activeLayer: GrossLayer;
+  fiberType: FiberType;
   muscleId: string;
   nodeId: string;
 }
@@ -26,12 +36,136 @@ function formatFiberTypes(muscleId: string): string {
 
 export default function InfoPanel({
   activeLayer,
+  fiberType,
   muscleId,
   nodeId,
 }: InfoPanelProps) {
   const muscle = getMuscleDetail(muscleId);
   const layer = GROSS_LAYERS.find((item) => item.id === activeLayer);
-  const isMuscleView = nodeId === muscleId || nodeId.endsWith("_fascicle");
+  const isFascicleView = nodeId.endsWith("_fascicle");
+  const isFiberView = nodeId.endsWith("_fiber");
+  const isMyofibrilView = nodeId.endsWith("_myofibril");
+  const isMuscleView = nodeId === muscleId;
+
+  if (isFascicleView) {
+    return (
+      <section className="panel info-grid" aria-labelledby="info-panel-heading">
+        <h2 id="info-panel-heading">{muscle.name} fascicle</h2>
+        <p>
+          Fascicle cross-section with perimysium, endomysium, capillaries, and
+          instanced muscle fibers.
+        </p>
+        <dl>
+          <div>
+            <dt>Diameter</dt>
+            <dd>{DEFAULT_FASCICLE_CONFIG.diameter_um} um</dd>
+          </div>
+          <div>
+            <dt>Fibers</dt>
+            <dd>
+              {DEFAULT_FASCICLE_CONFIG.fiberCount} visible of a 10-100
+              biological range
+            </dd>
+          </div>
+          <div>
+            <dt>Perimysium</dt>
+            <dd>2-layer crossed wavy collagen sheath</dd>
+          </div>
+          <div>
+            <dt>Endomysium</dt>
+            <dd>Thin membranes between individual fibers</dd>
+          </div>
+          <div>
+            <dt>Vasculature</dt>
+            <dd>Capillaries between fibers and vessels in the perimysium</dd>
+          </div>
+        </dl>
+      </section>
+    );
+  }
+
+  if (isFiberView) {
+    const profile = getFiberTypeProfile(fiberType);
+    const organelles = getFiberOrganelleCounts(fiberType);
+
+    return (
+      <section className="panel info-grid" aria-labelledby="info-panel-heading">
+        <h2 id="info-panel-heading">{profile.label} muscle fiber</h2>
+        <p>{profile.description}</p>
+        <dl>
+          <div>
+            <dt>Myosin gene</dt>
+            <dd>{profile.myosinGene}</dd>
+          </div>
+          <div>
+            <dt>Diameter and length</dt>
+            <dd>
+              {profile.diameter_um} um diameter, {profile.length_cm} cm length
+            </dd>
+          </div>
+          <div>
+            <dt>Nuclei</dt>
+            <dd>
+              {profile.nucleiCount} peripheral nuclei, {organelles.nuclei}{" "}
+              rendered
+            </dd>
+          </div>
+          <div>
+            <dt>Myofibrils</dt>
+            <dd>
+              {profile.myofibrilCount} estimated, {organelles.myofibrils}{" "}
+              nearest rendered
+            </dd>
+          </div>
+          <div>
+            <dt>T-tubules</dt>
+            <dd>
+              {T_TUBULE_SPACING_UM} um spacing, {T_TUBULE_LUMEN_NM[0]}-
+              {T_TUBULE_LUMEN_NM[1]} nm lumen
+            </dd>
+          </div>
+          <div>
+            <dt>Mitochondria</dt>
+            <dd>
+              {profile.mitochondriaVolumePct}% volume, {organelles.mitochondria}{" "}
+              rendered
+            </dd>
+          </div>
+          <div>
+            <dt>Sarcolemma</dt>
+            <dd>{SARCOLEMMA_THICKNESS_NM} nm conceptual membrane shell</dd>
+          </div>
+          <div>
+            <dt>Satellite cells</dt>
+            <dd>Pax7+ stem cells under basal lamina for regeneration</dd>
+          </div>
+        </dl>
+      </section>
+    );
+  }
+
+  if (isMyofibrilView) {
+    return (
+      <section className="panel info-grid" aria-labelledby="info-panel-heading">
+        <h2 id="info-panel-heading">Myofibril</h2>
+        <p>
+          Banded contractile cylinder packed with serial sarcomeres, ready for
+          Level 7 detail.
+        </p>
+        <dl>
+          <div>
+            <dt>Diameter</dt>
+            <dd>1-2 um</dd>
+          </div>
+          <div>
+            <dt>Banding</dt>
+            <dd>Repeating I-band and A-band pattern</dd>
+          </div>
+        </dl>
+      </section>
+    );
+  }
+
   const node = isMuscleView ? null : getNode(nodeId);
 
   if (isMuscleView) {

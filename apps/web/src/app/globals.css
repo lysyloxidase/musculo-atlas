@@ -311,6 +311,38 @@ h1 {
   color: var(--text);
 }
 
+.micro-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.micro-controls button,
+.fiber-type-toggle button {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #191918;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.micro-controls button[aria-pressed="true"],
+.fiber-type-toggle button[aria-pressed="true"] {
+  border-color: var(--gold);
+  background: rgb(215 185 93 / 12%);
+  color: var(--text);
+}
+
+.fiber-type-toggle {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
 .legend-list {
   display: grid;
   gap: 8px;

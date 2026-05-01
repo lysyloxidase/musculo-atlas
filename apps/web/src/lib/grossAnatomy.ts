@@ -388,15 +388,36 @@ export function getPennationArrowCount(muscleId: string): number {
 }
 
 export function getGrossBreadcrumbLabels(nodeId: string): string[] {
-  const resolvedId = resolveMuscleId(nodeId.replace("_fascicle", ""));
+  const isFascicle = nodeId.endsWith("_fascicle");
+  const isFiber = nodeId.endsWith("_fiber");
+  const isMyofibril = nodeId.endsWith("_myofibril");
+  const resolvedId = resolveMuscleId(
+    nodeId
+      .replace("_fascicle", "")
+      .replace("_fiber", "")
+      .replace("_myofibril", ""),
+  );
 
   if (
     resolvedId === "rectus_femoris" ||
     ANTERIOR_THIGH_REGION.muscles.includes(resolvedId)
   ) {
     const muscle = getMuscleDetail(resolvedId);
+    const labels = ["Body", "Lower Limb", "Anterior Thigh", muscle.name];
 
-    return ["Body", "Lower Limb", "Anterior Thigh", muscle.name];
+    if (isFascicle) {
+      return [...labels, "Fascicle"];
+    }
+
+    if (isFiber) {
+      return [...labels, "Fascicle", "Fiber"];
+    }
+
+    if (isMyofibril) {
+      return [...labels, "Fascicle", "Fiber", "Myofibril"];
+    }
+
+    return labels;
   }
 
   if (nodeId === ANTERIOR_THIGH_REGION.id) {
