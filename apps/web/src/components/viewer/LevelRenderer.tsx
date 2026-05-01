@@ -1,4 +1,6 @@
+import type { AtlasAction, AtlasState } from "@/lib/atlasState";
 import type { ZoomLevel } from "@/lib/types";
+import type { Dispatch } from "react";
 import type { ComponentType } from "react";
 import L1Body from "../levels/L1_Body";
 import L2System from "../levels/L2_System";
@@ -11,7 +13,12 @@ import L8Sarcomere from "../levels/L8_Sarcomere";
 import L9Protein from "../levels/L9_Protein";
 import L10Atom from "../levels/L10_Atom";
 
-const renderers: Record<ZoomLevel, ComponentType> = {
+export interface GrossLevelProps {
+  dispatch: Dispatch<AtlasAction>;
+  state: AtlasState;
+}
+
+const renderers: Record<ZoomLevel, ComponentType<GrossLevelProps>> = {
   1: L1Body,
   2: L2System,
   3: L3Region,
@@ -24,12 +31,16 @@ const renderers: Record<ZoomLevel, ComponentType> = {
   10: L10Atom,
 };
 
-interface LevelRendererProps {
+interface LevelRendererProps extends GrossLevelProps {
   level: ZoomLevel;
 }
 
-export default function LevelRenderer({ level }: LevelRendererProps) {
+export default function LevelRenderer({
+  dispatch,
+  level,
+  state,
+}: LevelRendererProps) {
   const Renderer = renderers[level];
 
-  return <Renderer />;
+  return <Renderer dispatch={dispatch} state={state} />;
 }

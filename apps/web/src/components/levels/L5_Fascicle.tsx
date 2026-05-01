@@ -1,6 +1,8 @@
-export default function L5Fascicle() {
+import type { GrossLevelProps } from "../viewer/LevelRenderer";
+
+export default function L5Fascicle({ state }: GrossLevelProps) {
   return (
-    <group name="L5 fascicle">
+    <group name={`L5 fascicle ${state.selectedMuscleId}`}>
       {[-0.26, 0, 0.26].map((y) => (
         <mesh key={y} position={[0, y, 0]} rotation={[0, 0, Math.PI / 2]}>
           <capsuleGeometry args={[0.08, 1.2, 12, 32]} />

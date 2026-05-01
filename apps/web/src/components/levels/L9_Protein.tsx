@@ -1,4 +1,6 @@
-export default function L9Protein() {
+import type { GrossLevelProps } from "../viewer/LevelRenderer";
+
+export default function L9Protein(_props: GrossLevelProps) {
   return (
     <group name="L9 protein">
       {Array.from({ length: 12 }, (_, index) => {

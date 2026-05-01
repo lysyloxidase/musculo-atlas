@@ -1,18 +1,18 @@
-import { getBreadcrumb } from "@/lib/hierarchy";
+import { getGrossBreadcrumbLabels } from "@/lib/grossAnatomy";
 
 interface BreadcrumbNavProps {
   nodeId: string;
 }
 
 export default function BreadcrumbNav({ nodeId }: BreadcrumbNavProps) {
-  const breadcrumb = getBreadcrumb(nodeId);
+  const breadcrumb = getGrossBreadcrumbLabels(nodeId);
 
   return (
     <nav aria-label="Anatomy breadcrumb" className="breadcrumb">
-      {breadcrumb.map((node, index) => (
-        <span key={node.id}>
+      {breadcrumb.map((label, index) => (
+        <span key={label}>
           {index > 0 ? ">" : ""}
-          {node.name}
+          {label}
         </span>
       ))}
     </nav>

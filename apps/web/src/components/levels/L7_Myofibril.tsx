@@ -1,6 +1,7 @@
 import InstancedSarcomeres from "../shared/InstancedSarcomeres";
+import type { GrossLevelProps } from "../viewer/LevelRenderer";
 
-export default function L7Myofibril() {
+export default function L7Myofibril(_props: GrossLevelProps) {
   return (
     <group name="L7 myofibril">
       <mesh rotation={[0, 0, Math.PI / 2]}>

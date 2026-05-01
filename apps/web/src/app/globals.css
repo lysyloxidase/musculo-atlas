@@ -168,6 +168,31 @@ h1 {
   line-height: 1.5;
 }
 
+.info-grid dl {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0 0;
+}
+
+.info-grid div {
+  display: grid;
+  gap: 3px;
+}
+
+.info-grid dt {
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.info-grid dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
 .breadcrumb {
   display: flex;
   flex-wrap: wrap;
@@ -259,6 +284,31 @@ h1 {
   background: rgb(23 23 23 / 82%);
   color: var(--text);
   cursor: pointer;
+}
+
+.layer-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.layer-toggle button {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #191918;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.layer-toggle button[aria-pressed="true"] {
+  border-color: var(--teal);
+  background: rgb(95 208 197 / 10%);
+  color: var(--text);
 }
 
 .legend-list {

@@ -1,0 +1,17 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "MusculoAtlas Phase 2 placeholder for BodyParts3D adult body LOD0"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [0]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "adult_body_lod0_placeholder"
+    }
+  ]
+}

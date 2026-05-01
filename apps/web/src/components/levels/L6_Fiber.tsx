@@ -1,4 +1,6 @@
-export default function L6Fiber() {
+import type { GrossLevelProps } from "../viewer/LevelRenderer";
+
+export default function L6Fiber(_props: GrossLevelProps) {
   return (
     <group name="L6 fiber">
       <mesh rotation={[0, 0, Math.PI / 2]}>

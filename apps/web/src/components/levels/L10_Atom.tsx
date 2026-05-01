@@ -1,4 +1,6 @@
-export default function L10Atom() {
+import type { GrossLevelProps } from "../viewer/LevelRenderer";
+
+export default function L10Atom(_props: GrossLevelProps) {
   return (
     <group name="L10 atom and domain detail">
       {[

@@ -16,8 +16,8 @@ export default function SearchOverlay({ onSelect }: SearchOverlayProps) {
       return [];
     }
 
-    return HIERARCHY_NODES.filter((node) =>
-      node.name.toLowerCase().includes(normalized),
+    return HIERARCHY_NODES.filter(
+      (node) => node.level <= 4 && node.name.toLowerCase().includes(normalized),
     ).slice(0, 6);
   }, [query]);
 

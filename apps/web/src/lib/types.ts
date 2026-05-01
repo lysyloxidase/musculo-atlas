@@ -51,6 +51,36 @@ export interface MuscleCatalogEntry {
   source: string;
 }
 
+export interface FiberTypeComposition {
+  I: number;
+  IIa: number;
+  IIx: number;
+}
+
+export interface OpenSimParameters {
+  max_iso_force_N: number;
+  opt_fiber_length_m: number;
+  tendon_slack_m: number;
+}
+
+export type PennationPattern =
+  | "parallel"
+  | "unipennate"
+  | "bipennate"
+  | "multipennate";
+
+export interface MuscleDetail extends MuscleCatalogEntry {
+  origin: string;
+  insertion: string;
+  action: string;
+  blood_supply: string;
+  clinical: string;
+  fiber_type_pct?: FiberTypeComposition;
+  opensim?: OpenSimParameters;
+  pennation_pattern: PennationPattern;
+  fully_detailed: boolean;
+}
+
 export interface PdbCatalogEntry {
   protein: string;
   display_name: string;

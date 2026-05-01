@@ -102,7 +102,13 @@ export const HIERARCHY_NODES: HierarchyNode[] = [
     parent_id: "lower_limb",
   },
   {
-    children_ids: ["rectus_femoris", "vastus_lateralis"],
+    children_ids: [
+      "rectus_femoris",
+      "vastus_lateralis",
+      "vastus_medialis",
+      "vastus_intermedius",
+      "sartorius",
+    ],
     description:
       "Anterior thigh extensor compartment dominated by the quadriceps femoris group.",
     dimensions: {
@@ -182,6 +188,54 @@ export const HIERARCHY_NODES: HierarchyNode[] = [
     level: 4,
     mesh_path: "/models/muscles/vastus_lateralis.gltf",
     name: "Vastus lateralis",
+    parent_id: "anterior_thigh_compartment",
+  },
+  {
+    children_ids: [],
+    description:
+      "The medial quadriceps component that extends the knee and contributes to patellar tracking.",
+    dimensions: {
+      length: { unit: "cm", value: 5.7 },
+      scale_meters: 0.057,
+      source: "Ward et al. 2009 human lower-limb muscle architecture",
+    },
+    id: "vastus_medialis",
+    latin_name: "Musculus vastus medialis",
+    level: 4,
+    mesh_path: "/models/muscles/vastus_medialis.gltf",
+    name: "Vastus medialis",
+    parent_id: "anterior_thigh_compartment",
+  },
+  {
+    children_ids: [],
+    description:
+      "The deep quadriceps component lying between vastus medialis and vastus lateralis on the femur.",
+    dimensions: {
+      length: { unit: "cm", value: 7 },
+      scale_meters: 0.07,
+      source: "Ward et al. 2009 human lower-limb muscle architecture",
+    },
+    id: "vastus_intermedius",
+    latin_name: "Musculus vastus intermedius",
+    level: 4,
+    mesh_path: "/models/muscles/vastus_intermedius.gltf",
+    name: "Vastus intermedius",
+    parent_id: "anterior_thigh_compartment",
+  },
+  {
+    children_ids: [],
+    description:
+      "A long strap muscle crossing hip and knee, contributing hip flexion, abduction, lateral rotation, and knee flexion.",
+    dimensions: {
+      length: { unit: "cm", value: 30 },
+      scale_meters: 0.3,
+      source: "Ward et al. 2009 human lower-limb muscle architecture",
+    },
+    id: "sartorius",
+    latin_name: "Musculus sartorius",
+    level: 4,
+    mesh_path: "/models/muscles/sartorius.gltf",
+    name: "Sartorius",
     parent_id: "anterior_thigh_compartment",
   },
   {

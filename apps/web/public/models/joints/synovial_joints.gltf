@@ -1,0 +1,17 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "MusculoAtlas Phase 2 placeholder for major synovial joints"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [0]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "synovial_joints_placeholder"
+    }
+  ]
+}

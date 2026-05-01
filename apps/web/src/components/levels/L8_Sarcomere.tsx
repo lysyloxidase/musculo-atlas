@@ -1,6 +1,7 @@
 import InstancedFilaments from "../shared/InstancedFilaments";
+import type { GrossLevelProps } from "../viewer/LevelRenderer";
 
-export default function L8Sarcomere() {
+export default function L8Sarcomere(_props: GrossLevelProps) {
   return (
     <group name="L8 sarcomere">
       <mesh position={[-0.62, 0, 0]}>

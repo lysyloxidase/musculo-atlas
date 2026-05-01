@@ -1,0 +1,17 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "MusculoAtlas Phase 2 placeholder for segmented muscle groups"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [0]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "major_muscle_groups_placeholder"
+    }
+  ]
+}
