@@ -1,4 +1,10 @@
 import muscleCatalog from "../data/muscles.json";
+import {
+  getDomainStructure,
+  getProteinStructure,
+  isDomainId,
+  isProteinId,
+} from "./molecular";
 import type { MuscleCatalogEntry, MuscleDetail } from "./types";
 
 export type GrossLayer = "skeleton" | "muscle" | "connective" | "joints";
@@ -388,6 +394,30 @@ export function getPennationArrowCount(muscleId: string): number {
 }
 
 export function getGrossBreadcrumbLabels(nodeId: string): string[] {
+  const baseMolecularLabels = [
+    "Body",
+    "Lower Limb",
+    "Anterior Thigh",
+    "Rectus femoris",
+    "Fascicle",
+    "Fiber",
+    "Myofibril",
+    "Sarcomere",
+  ];
+
+  if (isDomainId(nodeId)) {
+    const domain = getDomainStructure(nodeId);
+    const protein = getProteinStructure(domain.proteinId);
+
+    return [...baseMolecularLabels, protein.displayName, domain.displayName];
+  }
+
+  if (isProteinId(nodeId)) {
+    const protein = getProteinStructure(nodeId);
+
+    return [...baseMolecularLabels, protein.displayName];
+  }
+
   const isFascicle = nodeId.endsWith("_fascicle");
   const isFiber = nodeId.endsWith("_fiber");
   const isMyofibril = nodeId.endsWith("_myofibril");

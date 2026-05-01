@@ -1,6 +1,6 @@
 "use client";
 
-import { getCameraDistance } from "@/lib/zoom";
+import { getCameraDistance, getZoomLevel } from "@/lib/zoom";
 import { useFrame, useThree } from "@react-three/fiber";
 
 interface ZoomControllerProps {
@@ -9,7 +9,11 @@ interface ZoomControllerProps {
 
 export default function ZoomController({ zoomValue }: ZoomControllerProps) {
   const { camera } = useThree();
-  const targetDistance = getCameraDistance(zoomValue);
+  const level = getZoomLevel(zoomValue);
+  const targetDistance =
+    level >= 9
+      ? Math.max(2.4, getCameraDistance(zoomValue))
+      : getCameraDistance(zoomValue);
 
   useFrame(() => {
     camera.position.z += (targetDistance - camera.position.z) * 0.08;

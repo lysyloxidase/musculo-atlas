@@ -1,5 +1,17 @@
 import type { GrossLayer } from "./grossAnatomy";
 import type { FiberType } from "./microAnatomy";
+import {
+  type DomainId,
+  type MolecularRenderMode,
+  type ProteinId,
+  type TroponinState,
+  getDefaultDomainForProtein,
+  getDomainStructure,
+  isDomainId,
+  parseMolecularRenderMode,
+  parseTroponinState,
+  resolveProteinIdFromFilament,
+} from "./molecular";
 import { clampSarcomereLength } from "./sarcomere";
 import type { ZoomLevel } from "./types";
 
@@ -9,10 +21,15 @@ export interface AtlasState {
   crossBridgeStep: number;
   fascicleCrossSection: boolean;
   fiberType: FiberType;
+  molecularRenderMode: MolecularRenderMode;
   sarcomereLengthUm: number;
+  selectedAtomId: string | null;
+  selectedDomainId: DomainId;
   selectedFiberId: string;
   selectedMuscleId: string;
   selectedNodeId: string;
+  selectedProteinId: ProteinId;
+  troponinState: TroponinState;
   zoomValue: number;
 }
 
@@ -27,9 +44,14 @@ export type AtlasAction =
   | { type: "select_myofibril"; myofibrilId: string }
   | { type: "select_sarcomere"; sarcomereId: string }
   | { type: "select_filament"; filamentId: string }
+  | { type: "select_protein"; proteinId: ProteinId }
+  | { type: "select_domain"; domainId: DomainId }
+  | { type: "select_atom"; atomId: string }
   | { type: "set_fiber_type"; fiberType: FiberType }
   | { type: "set_sarcomere_length"; lengthUm: number }
   | { type: "set_cross_bridge_step"; step: number }
+  | { type: "set_molecular_render_mode"; mode: MolecularRenderMode }
+  | { type: "set_troponin_state"; state: TroponinState }
   | { type: "toggle_fascicle_cross_section" };
 
 export const DEFAULT_ATLAS_STATE: AtlasState = {
@@ -38,10 +60,15 @@ export const DEFAULT_ATLAS_STATE: AtlasState = {
   crossBridgeStep: 0,
   fascicleCrossSection: true,
   fiberType: "type_I",
+  molecularRenderMode: "surface",
   sarcomereLengthUm: 2.4,
+  selectedAtomId: null,
+  selectedDomainId: "titin_ig_domain",
   selectedFiberId: "fiber_1",
   selectedMuscleId: "rectus_femoris",
   selectedNodeId: "body",
+  selectedProteinId: "titin",
+  troponinState: "blocked",
   zoomValue: 0,
 };
 
@@ -53,6 +80,18 @@ export function createAtlasStateFromSearch(search: string): AtlasState {
   const fiberType = params.get("fiberType") as FiberType | null;
   const sarcomereLengthUm = Number(params.get("sl"));
   const crossBridgeStep = Number(params.get("bridge"));
+  const protein = params.get("protein");
+  const domain = params.get("domain");
+  const atom = params.get("atom");
+  const molecularRenderMode = parseMolecularRenderMode(params.get("mode"));
+  const troponinState = parseTroponinState(params.get("troponin"));
+  const selectedProteinId = protein
+    ? resolveProteinIdFromFilament(protein)
+    : DEFAULT_ATLAS_STATE.selectedProteinId;
+  const selectedDomainId =
+    domain && isDomainId(domain)
+      ? domain
+      : getDefaultDomainForProtein(selectedProteinId);
 
   return {
     ...DEFAULT_ATLAS_STATE,
@@ -65,11 +104,23 @@ export function createAtlasStateFromSearch(search: string): AtlasState {
       fiberType === "type_IIx"
         ? fiberType
         : DEFAULT_ATLAS_STATE.fiberType,
+    molecularRenderMode:
+      molecularRenderMode ?? DEFAULT_ATLAS_STATE.molecularRenderMode,
+    selectedAtomId: atom ?? DEFAULT_ATLAS_STATE.selectedAtomId,
+    selectedDomainId,
     selectedMuscleId: muscle ?? DEFAULT_ATLAS_STATE.selectedMuscleId,
-    selectedNodeId: node ?? DEFAULT_ATLAS_STATE.selectedNodeId,
+    selectedNodeId:
+      node ??
+      (domain && isDomainId(domain)
+        ? domain
+        : protein
+          ? selectedProteinId
+          : DEFAULT_ATLAS_STATE.selectedNodeId),
+    selectedProteinId,
     sarcomereLengthUm: Number.isFinite(sarcomereLengthUm)
       ? clampSarcomereLength(sarcomereLengthUm)
       : DEFAULT_ATLAS_STATE.sarcomereLengthUm,
+    troponinState: troponinState ?? DEFAULT_ATLAS_STATE.troponinState,
     zoomValue: Number.isFinite(zoom)
       ? clampZoom(zoom)
       : DEFAULT_ATLAS_STATE.zoomValue,
@@ -143,11 +194,38 @@ export function atlasReducer(
         selectedNodeId: "rectus_femoris_sarcomere",
         zoomValue: LEVEL_ENTRY_ZOOM[8],
       };
-    case "select_filament":
+    case "select_filament": {
+      const proteinId = resolveProteinIdFromFilament(action.filamentId);
+
       return {
         ...state,
-        selectedNodeId: action.filamentId,
+        selectedDomainId: getDefaultDomainForProtein(proteinId),
+        selectedNodeId: proteinId,
+        selectedProteinId: proteinId,
         zoomValue: LEVEL_ENTRY_ZOOM[9],
+      };
+    }
+    case "select_protein":
+      return {
+        ...state,
+        selectedDomainId: getDefaultDomainForProtein(action.proteinId),
+        selectedNodeId: action.proteinId,
+        selectedProteinId: action.proteinId,
+        zoomValue: LEVEL_ENTRY_ZOOM[9],
+      };
+    case "select_domain":
+      return {
+        ...state,
+        selectedAtomId: null,
+        selectedDomainId: action.domainId,
+        selectedNodeId: action.domainId,
+        selectedProteinId: getDomainStructure(action.domainId).proteinId,
+        zoomValue: LEVEL_ENTRY_ZOOM[10],
+      };
+    case "select_atom":
+      return {
+        ...state,
+        selectedAtomId: action.atomId,
       };
     case "select_region":
       return {
@@ -170,6 +248,16 @@ export function atlasReducer(
       return {
         ...state,
         crossBridgeStep: Math.max(0, Math.round(action.step)),
+      };
+    case "set_molecular_render_mode":
+      return {
+        ...state,
+        molecularRenderMode: action.mode,
+      };
+    case "set_troponin_state":
+      return {
+        ...state,
+        troponinState: action.state,
       };
     case "toggle_fascicle_cross_section":
       return {

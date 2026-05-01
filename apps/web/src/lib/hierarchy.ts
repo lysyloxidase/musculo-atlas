@@ -291,7 +291,17 @@ export const HIERARCHY_NODES: HierarchyNode[] = [
     physiology: "Serial sarcomere shortening sums into fiber shortening.",
   },
   {
-    children_ids: ["myosin_ii", "actin", "titin"],
+    children_ids: [
+      "myosin_ii",
+      "actin",
+      "titin",
+      "tropomyosin",
+      "troponin",
+      "nebulin",
+      "alpha_actinin_2",
+      "serca",
+      "ryr1",
+    ],
     biochemistry:
       "ATP-driven myosin-actin cycling, calcium-regulated troponin-tropomyosin switching, and titin elasticity produce active and passive force.",
     description:
@@ -310,7 +320,7 @@ export const HIERARCHY_NODES: HierarchyNode[] = [
     physiology: "The fundamental force-generating unit of striated muscle.",
   },
   {
-    children_ids: [],
+    children_ids: ["myosin_s1_motor"],
     biochemistry:
       "Hexameric type-II myosin converts ATP hydrolysis into lever-arm rotation and filament sliding.",
     description:
@@ -329,7 +339,7 @@ export const HIERARCHY_NODES: HierarchyNode[] = [
     procedural_type: "protein_structure",
   },
   {
-    children_ids: [],
+    children_ids: ["actin_monomer"],
     biochemistry:
       "Globular actin polymerizes into helical F-actin thin filaments that expose myosin-binding sites under calcium control.",
     description: "The thin-filament backbone protein of the sarcomere.",
@@ -369,6 +379,155 @@ export const HIERARCHY_NODES: HierarchyNode[] = [
   {
     children_ids: [],
     biochemistry:
+      "Coiled-coil dimer that sterically regulates myosin-binding sites on actin.",
+    description:
+      "A thin-filament regulatory strand sitting in the actin groove and shifting through blocked, closed, and open positions.",
+    dimensions: {
+      length: { unit: "nm", value: 40 },
+      mass_kda: 66,
+      scale_meters: 0.00000004,
+      source: "RCSB PDB 5JLH/5NOG/5NOL; thin-filament regulation reviews",
+    },
+    id: "tropomyosin",
+    level: 9,
+    name: "Tropomyosin",
+    parent_id: "rectus_femoris_sarcomere",
+    pdb_id: "5JLH",
+    procedural_type: "protein_structure",
+  },
+  {
+    children_ids: [],
+    biochemistry:
+      "Troponin C binds calcium, troponin I relieves inhibition, and troponin T couples the complex to tropomyosin.",
+    description:
+      "The calcium sensor of the thin filament, repeated approximately every 38.5 nm.",
+    dimensions: {
+      mass_kda: 79,
+      scale_meters: 0.000000012,
+      source: "RCSB PDB 6KN8/6KLN; thin-filament calcium regulation studies",
+    },
+    id: "troponin",
+    level: 9,
+    name: "Troponin complex",
+    parent_id: "rectus_femoris_sarcomere",
+    pdb_id: "6KN8",
+    procedural_type: "protein_structure",
+  },
+  {
+    children_ids: [],
+    biochemistry:
+      "Nebulin repeats bind actin and help specify the mature thin-filament length.",
+    description:
+      "A giant actin-associated ruler protein running along the thin filament.",
+    dimensions: {
+      length: { unit: "um", value: 1 },
+      mass_kda: 750,
+      scale_meters: 0.000001,
+      source: "RCSB PDB 7QIM; Wang et al. Science 2022 nebulin thin filament",
+    },
+    id: "nebulin",
+    level: 9,
+    name: "Nebulin",
+    parent_id: "rectus_femoris_sarcomere",
+    pdb_id: "7QIM",
+    procedural_type: "protein_structure",
+  },
+  {
+    children_ids: ["alpha_actinin_spectrin_repeat"],
+    biochemistry:
+      "Antiparallel alpha-actinin dimers cross-link actin filaments and bind titin Z-repeats.",
+    description:
+      "The main Z-disc actin cross-linker organizing sarcomere lateral registry.",
+    dimensions: {
+      length: { unit: "nm", value: 35 },
+      mass_kda: 200,
+      scale_meters: 0.000000035,
+      source: "RCSB PDB 4D1E; Z-disc alpha-actinin structural studies",
+    },
+    id: "alpha_actinin_2",
+    level: 9,
+    name: "Alpha-actinin-2",
+    parent_id: "rectus_femoris_sarcomere",
+    pdb_id: "4D1E",
+    procedural_type: "protein_structure",
+  },
+  {
+    children_ids: [],
+    biochemistry:
+      "SERCA cycles between calcium-bound E1 and lumen-facing E2 states to restore SR calcium stores.",
+    description:
+      "The sarcoplasmic-reticulum calcium ATPase pump that terminates contraction.",
+    dimensions: {
+      mass_kda: 110,
+      scale_meters: 0.00000001,
+      source: "RCSB PDB 1SU4/3TLM; SERCA calcium pump structures",
+    },
+    id: "serca",
+    level: 9,
+    name: "SERCA calcium pump",
+    parent_id: "rectus_femoris_sarcomere",
+    pdb_id: "1SU4",
+    procedural_type: "protein_structure",
+  },
+  {
+    children_ids: [],
+    biochemistry:
+      "RyR1 opens at the triad to release calcium from terminal cisternae into the myoplasm.",
+    description:
+      "A massive homotetrameric SR calcium-release channel coupled to DHPR voltage sensors.",
+    dimensions: {
+      mass_kda: 2200,
+      scale_meters: 0.000000027,
+      source: "RCSB PDB 5T15/7M6L; RyR1 cryo-EM calcium release structures",
+    },
+    id: "ryr1",
+    level: 9,
+    name: "RyR1 calcium release channel",
+    parent_id: "rectus_femoris_sarcomere",
+    pdb_id: "5T15",
+    procedural_type: "protein_structure",
+  },
+  {
+    children_ids: [],
+    biochemistry:
+      "ATP hydrolysis and phosphate release are coupled to converter rotation and lever-arm swing.",
+    description:
+      "The myosin S1 motor domain with nucleotide pocket, actin-binding loops, converter, and lever arm.",
+    dimensions: {
+      length: { unit: "nm", value: 16.5 },
+      mass_kda: 225,
+      scale_meters: 0.0000000165,
+      source: "RCSB PDB 2MYS; myosin motor domain structural studies",
+    },
+    id: "myosin_s1_motor",
+    level: 10,
+    name: "Myosin S1 motor domain",
+    parent_id: "myosin_ii",
+    pdb_id: "2MYS",
+    procedural_type: "domain_detail",
+  },
+  {
+    children_ids: [],
+    biochemistry:
+      "The actin nucleotide cleft binds ATP or ADP and controls filament dynamics.",
+    description:
+      "A single actin subunit with four subdomains and barbed/pointed polarity faces.",
+    dimensions: {
+      length: { unit: "nm", value: 5.5 },
+      mass_kda: 42,
+      scale_meters: 0.0000000055,
+      source: "RCSB PDB 1ATN; actin monomer structural studies",
+    },
+    id: "actin_monomer",
+    level: 10,
+    name: "Actin monomer",
+    parent_id: "actin",
+    pdb_id: "1ATN",
+    procedural_type: "domain_detail",
+  },
+  {
+    children_ids: [],
+    biochemistry:
       "A beta-sandwich Ig-like fold whose forced unfolding contributes to titin extensibility.",
     description:
       "An immunoglobulin-like titin domain resolved in atomic detail.",
@@ -383,6 +542,24 @@ export const HIERARCHY_NODES: HierarchyNode[] = [
     name: "Titin Ig domain",
     parent_id: "titin",
     pdb_id: "1TIT",
+    procedural_type: "domain_detail",
+  },
+  {
+    children_ids: [],
+    biochemistry:
+      "Three-helix spectrin repeats form the spacer rod that positions Z-disc actin cross-links.",
+    description:
+      "A representative alpha-actinin-2 spectrin repeat resolved from the full-length dimer.",
+    dimensions: {
+      length: { unit: "nm", value: 5 },
+      scale_meters: 0.000000005,
+      source: "RCSB PDB 4D1E; alpha-actinin-2 Z-disc structural studies",
+    },
+    id: "alpha_actinin_spectrin_repeat",
+    level: 10,
+    name: "Alpha-actinin-2 spectrin repeat",
+    parent_id: "alpha_actinin_2",
+    pdb_id: "4D1E",
     procedural_type: "domain_detail",
   },
 ];

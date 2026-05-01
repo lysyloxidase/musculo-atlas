@@ -17,18 +17,33 @@ import {
   getFiberTypeProfile,
 } from "@/lib/microAnatomy";
 import {
+  type MolecularRenderMode,
+  type TroponinState,
+  getAtomsForDomain,
+  getDomainStructure,
+  getProteinStructure,
+  getTroponinShiftNm,
+  getTroponinStateLabel,
+  isDomainId,
+  isProteinId,
+} from "@/lib/molecular";
+import {
   calculateBandGeometry,
   getCrossBridgeStep,
   getLengthTensionForce,
 } from "@/lib/sarcomere";
+import MolstarEmbed from "../shared/MolstarEmbed";
 
 interface InfoPanelProps {
   activeLayer: GrossLayer;
   crossBridgeStep: number;
   fiberType: FiberType;
+  molecularRenderMode: MolecularRenderMode;
   muscleId: string;
   nodeId: string;
   sarcomereLengthUm: number;
+  selectedAtomId: string | null;
+  troponinState: TroponinState;
 }
 
 function formatFiberTypes(muscleId: string): string {
@@ -45,9 +60,12 @@ export default function InfoPanel({
   activeLayer,
   crossBridgeStep,
   fiberType,
+  molecularRenderMode,
   muscleId,
   nodeId,
   sarcomereLengthUm,
+  selectedAtomId,
+  troponinState,
 }: InfoPanelProps) {
   const muscle = getMuscleDetail(muscleId);
   const layer = GROSS_LAYERS.find((item) => item.id === activeLayer);
@@ -55,6 +73,8 @@ export default function InfoPanel({
   const isFiberView = nodeId.endsWith("_fiber");
   const isMyofibrilView = nodeId.endsWith("_myofibril");
   const isSarcomereView = nodeId.endsWith("_sarcomere");
+  const isProteinView = isProteinId(nodeId);
+  const isDomainView = isDomainId(nodeId);
   const isMuscleView = nodeId === muscleId;
 
   if (isFascicleView) {
@@ -220,6 +240,101 @@ export default function InfoPanel({
             <dd>{bridgeStep.label}</dd>
           </div>
         </dl>
+      </section>
+    );
+  }
+
+  if (isProteinView) {
+    const protein = getProteinStructure(nodeId);
+    const troponinShift = getTroponinShiftNm(troponinState);
+
+    return (
+      <section className="panel info-grid" aria-labelledby="info-panel-heading">
+        <h2 id="info-panel-heading">{protein.displayName}</h2>
+        <p>{protein.description}</p>
+        <dl>
+          <div>
+            <dt>Primary PDB</dt>
+            <dd>{protein.primaryPdbId}</dd>
+          </div>
+          <div>
+            <dt>Canonical structures</dt>
+            <dd>{protein.pdbIds.join(", ")}</dd>
+          </div>
+          <div>
+            <dt>Components</dt>
+            <dd>{protein.components.join("; ")}</dd>
+          </div>
+          <div>
+            <dt>Scale</dt>
+            <dd>
+              {protein.scaleNm[0]}-{protein.scaleNm[1]} nm
+            </dd>
+          </div>
+          <div>
+            <dt>Render mode</dt>
+            <dd>{molecularRenderMode.replaceAll("_", " ")}</dd>
+          </div>
+          {protein.id === "actin" || protein.id === "troponin" ? (
+            <div>
+              <dt>Troponin state</dt>
+              <dd>
+                {getTroponinStateLabel(troponinState)}; tropomyosin shift{" "}
+                {troponinShift.toFixed(1)} nm
+              </dd>
+            </div>
+          ) : null}
+        </dl>
+        {molecularRenderMode === "molstar" ? (
+          <MolstarEmbed height={220} pdbId={protein.primaryPdbId} />
+        ) : null}
+      </section>
+    );
+  }
+
+  if (isDomainView) {
+    const domain = getDomainStructure(nodeId);
+    const selectedAtom = selectedAtomId
+      ? getAtomsForDomain(nodeId).find((atom) => atom.id === selectedAtomId)
+      : null;
+
+    return (
+      <section className="panel info-grid" aria-labelledby="info-panel-heading">
+        <h2 id="info-panel-heading">{domain.displayName}</h2>
+        <p>{domain.description}</p>
+        <dl>
+          <div>
+            <dt>PDB</dt>
+            <dd>{domain.pdbId}</dd>
+          </div>
+          <div>
+            <dt>Fold</dt>
+            <dd>{domain.fold}</dd>
+          </div>
+          <div>
+            <dt>Residues</dt>
+            <dd>{domain.residues}</dd>
+          </div>
+          <div>
+            <dt>Secondary structure</dt>
+            <dd>{domain.secondaryStructure.join(", ")}</dd>
+          </div>
+          <div>
+            <dt>Highlights</dt>
+            <dd>{domain.highlights.join("; ")}</dd>
+          </div>
+          <div>
+            <dt>Atom pick</dt>
+            <dd>
+              {selectedAtom
+                ? `${selectedAtom.element} in ${selectedAtom.residue}${selectedAtom.residueIndex} at (${selectedAtom.x.toFixed(1)}, ${selectedAtom.y.toFixed(1)}, ${selectedAtom.z.toFixed(1)})`
+                : "Click an atom for element, residue, and coordinates"}
+            </dd>
+          </div>
+        </dl>
+        {molecularRenderMode === "molstar" ? (
+          <MolstarEmbed height={220} pdbId={domain.pdbId} />
+        ) : null}
       </section>
     );
   }

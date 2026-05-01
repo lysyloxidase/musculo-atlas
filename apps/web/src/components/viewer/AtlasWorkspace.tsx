@@ -7,6 +7,7 @@ import InfoPanel from "../ui/InfoPanel";
 import LayerToggle from "../ui/LayerToggle";
 import LegendPanel from "../ui/LegendPanel";
 import MicroAnatomyControls from "../ui/MicroAnatomyControls";
+import MolecularControls from "../ui/MolecularControls";
 import SearchOverlay from "../ui/SearchOverlay";
 import ZoomIndicator from "../ui/ZoomIndicator";
 import AtlasCanvas from "./AtlasCanvas";
@@ -41,11 +42,15 @@ export default function AtlasWorkspace() {
           activeLayer={state.activeLayer}
           crossBridgeStep={state.crossBridgeStep}
           fiberType={state.fiberType}
+          molecularRenderMode={state.molecularRenderMode}
           muscleId={state.selectedMuscleId}
+          selectedAtomId={state.selectedAtomId}
           nodeId={state.selectedNodeId}
           sarcomereLengthUm={state.sarcomereLengthUm}
+          troponinState={state.troponinState}
         />
         <MicroAnatomyControls dispatch={dispatch} state={state} />
+        <MolecularControls dispatch={dispatch} state={state} />
         <LegendPanel />
       </aside>
     </main>

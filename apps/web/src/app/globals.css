@@ -378,6 +378,73 @@ h1 {
   gap: 6px;
 }
 
+.molecular-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.mode-grid,
+.protein-grid,
+.troponin-state {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.protein-grid {
+  max-height: 148px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.troponin-state {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.molecular-controls button {
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #191918;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.molecular-controls button[aria-pressed="true"] {
+  border-color: var(--teal);
+  background: rgb(95 208 197 / 10%);
+  color: var(--text);
+}
+
+.pdb-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pdb-chip-list span {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 6px;
+  background: #191918;
+  color: var(--gold);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.molstar-frame {
+  overflow: hidden;
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #101010;
+}
+
+.molstar-frame iframe {
+  display: block;
+  border: 0;
+}
+
 .legend-list {
   display: grid;
   gap: 8px;

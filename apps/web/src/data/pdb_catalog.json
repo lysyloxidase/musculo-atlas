@@ -10,7 +10,7 @@
   {
     "protein": "actin",
     "display_name": "Actin",
-    "pdb_ids": ["3MFP", "1ATN", "6KN8"],
+    "pdb_ids": ["3MFP", "1ATN", "5JLH", "5NOG", "5NOL", "5NOJ", "6KN8"],
     "level": 9,
     "description": "G-actin, actin filament, and regulated thin-filament structural references.",
     "source": "RCSB PDB and project research brief canonical actin set"
@@ -26,7 +26,7 @@
   {
     "protein": "tropomyosin",
     "display_name": "Tropomyosin",
-    "pdb_ids": ["5JLH", "5NOG", "5NOL"],
+    "pdb_ids": ["5JLH", "5NOG", "5NOL", "5NOJ"],
     "level": 9,
     "description": "Thin-filament tropomyosin dimer and regulatory filament structures.",
     "source": "RCSB PDB and project research brief canonical tropomyosin set"
@@ -78,5 +78,29 @@
     "level": 10,
     "description": "Atomic-detail titin immunoglobulin-like beta-sandwich domain.",
     "source": "RCSB PDB 1TIT and project research brief L10 domain specification"
+  },
+  {
+    "protein": "myosin_s1_motor",
+    "display_name": "Myosin S1 motor domain",
+    "pdb_ids": ["2MYS", "5N69", "3I5G"],
+    "level": 10,
+    "description": "Atomic-detail myosin motor domain with nucleotide and actin-binding interfaces.",
+    "source": "RCSB PDB 2MYS, 5N69, 3I5G and project research brief L10 domain specification"
+  },
+  {
+    "protein": "actin_monomer",
+    "display_name": "Actin monomer",
+    "pdb_ids": ["1ATN", "3MFP"],
+    "level": 10,
+    "description": "Atomic-detail actin monomer showing four subdomains and the nucleotide cleft.",
+    "source": "RCSB PDB 1ATN and project research brief L10 domain specification"
+  },
+  {
+    "protein": "alpha_actinin_spectrin_repeat",
+    "display_name": "Alpha-actinin-2 spectrin repeat",
+    "pdb_ids": ["4D1E"],
+    "level": 10,
+    "description": "Atomic-detail alpha-actinin-2 spectrin repeat from the Z-disc rod.",
+    "source": "RCSB PDB 4D1E and project research brief L10 domain specification"
   }
 ]

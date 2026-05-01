@@ -1,14 +1,24 @@
+import { MOLSTAR_LOAD_TARGET_MS, getMolstarUrl } from "@/lib/molecular";
+
 interface MolstarEmbedProps {
+  height?: number;
   pdbId: string;
 }
 
-export default function MolstarEmbed({ pdbId }: MolstarEmbedProps) {
+export default function MolstarEmbed({
+  height = 260,
+  pdbId,
+}: MolstarEmbedProps) {
   return (
-    <iframe
-      src={`https://www.rcsb.org/3d-view/${pdbId}`}
-      title={`PDB ${pdbId} structure`}
-      width="100%"
-      height="420"
-    />
+    <div className="molstar-frame">
+      <iframe
+        data-load-target-ms={MOLSTAR_LOAD_TARGET_MS}
+        height={height}
+        loading="eager"
+        src={getMolstarUrl(pdbId)}
+        title={`Molstar PDB ${pdbId} structure`}
+        width="100%"
+      />
+    </div>
   );
 }
