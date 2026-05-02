@@ -744,6 +744,36 @@ h1 {
   background: rgb(157 141 241 / 14%);
 }
 
+.fidelity-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.fidelity-panel dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.fidelity-panel div {
+  display: grid;
+  gap: 3px;
+}
+
+.fidelity-panel dt {
+  color: var(--teal);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.fidelity-panel dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
 .legend-list {
   display: grid;
   gap: 8px;

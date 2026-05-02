@@ -1,9 +1,10 @@
 "use client";
 
-import { atlasReducer, createAtlasStateFromSearch } from "@/lib/atlasState";
+import { DEFAULT_ATLAS_STATE, atlasReducer } from "@/lib/atlasState";
 import type { ZoomLevel } from "@/lib/types";
 import { useEffect, useReducer, useRef } from "react";
 import BreadcrumbNav from "../ui/BreadcrumbNav";
+import FidelityPanel from "../ui/FidelityPanel";
 import InfoPanel from "../ui/InfoPanel";
 import LayerToggle from "../ui/LayerToggle";
 import LegendPanel from "../ui/LegendPanel";
@@ -17,13 +18,14 @@ import AtlasCanvas from "./AtlasCanvas";
 
 export default function AtlasWorkspace() {
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [state, dispatch] = useReducer(atlasReducer, "", () =>
-    createAtlasStateFromSearch(
-      typeof window === "undefined" ? "" : window.location.search,
-    ),
-  );
+  const [state, dispatch] = useReducer(atlasReducer, DEFAULT_ATLAS_STATE);
 
   useEffect(() => {
+    dispatch({
+      search: window.location.search,
+      type: "hydrate_from_search",
+    });
+
     function handleKeyDown(event: KeyboardEvent) {
       const nowMs = performance.now();
 
@@ -116,6 +118,7 @@ export default function AtlasWorkspace() {
         <PhysiologyOverlay dispatch={dispatch} state={state} />
         <MolecularControls dispatch={dispatch} state={state} />
         <TissueSystemsPanel dispatch={dispatch} state={state} />
+        <FidelityPanel state={state} />
         <LegendPanel />
       </aside>
     </main>

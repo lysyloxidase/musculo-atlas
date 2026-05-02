@@ -71,6 +71,7 @@ export interface AtlasState {
 }
 
 export type AtlasAction =
+  | { type: "hydrate_from_search"; search: string }
   | { type: "zoom"; value: number; nowMs?: number }
   | { type: "semantic_scroll"; deltaY: number; fine?: boolean; nowMs?: number }
   | { type: "jump_level"; level: ZoomLevel; nowMs?: number }
@@ -394,6 +395,8 @@ export function atlasReducer(
   action: AtlasAction,
 ): AtlasState {
   switch (action.type) {
+    case "hydrate_from_search":
+      return createAtlasStateFromSearch(action.search);
     case "semantic_scroll": {
       const zoomValue = applyScrollZoom(
         state.zoomValue,
