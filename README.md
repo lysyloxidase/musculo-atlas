@@ -6,7 +6,9 @@ MusculoAtlas is a monorepo atlas for continuous semantic zoom through gross anat
 
 ## Demo Path
 
-![Static MusculoAtlas demo path figure](docs/media/demo-path-figure.png)
+![MusculoAtlas Demo Path showing all 10 semantic zoom levels with atlas screenshots, scales, and structure descriptions](docs/media/demo-path-figure.png)
+
+The Demo Path is a static atlas figure: every level is shown with its current viewer screenshot, biological scale, and concise structure description.
 
 Canonical release breadcrumb:
 
