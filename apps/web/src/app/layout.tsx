@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  description: "A 10-level hierarchical musculoskeletal anatomy atlas.",
+  description:
+    "Zoom from a human body to a single atom across 10 levels of musculoskeletal anatomy.",
   title: "MusculoAtlas",
 };
 

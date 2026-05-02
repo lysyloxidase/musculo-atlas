@@ -12,8 +12,8 @@ export default function HomePage() {
           <p className="eyebrow">10-level anatomy atlas</p>
           <h1>MusculoAtlas</h1>
           <p className="entry-copy">
-            Navigate from whole-body musculoskeletal anatomy to sarcomere
-            proteins and atomic-scale domain references.
+            Zoom from a human body to a single atom across gross anatomy, muscle
+            microstructure, sarcomeres, proteins, and domain-level coordinates.
           </p>
         </div>
         <Link className="primary-link" href="/atlas">

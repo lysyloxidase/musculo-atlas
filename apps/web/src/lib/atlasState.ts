@@ -1,3 +1,4 @@
+import type { TissueSystemId } from "./connectiveTissue";
 import type { GrossLayer } from "./grossAnatomy";
 import { getMuscleDetail, resolveMuscleId } from "./grossAnatomy";
 import { HIERARCHY_BY_ID } from "./hierarchy";
@@ -15,6 +16,8 @@ import {
   parseTroponinState,
   resolveProteinIdFromFilament,
 } from "./molecular";
+import type { PhysiologyOverlayMode } from "./physiology";
+import { getNextEccStepIndex, getPreviousEccStepIndex } from "./physiology";
 import { clampSarcomereLength } from "./sarcomere";
 import {
   LEVEL_ENTRY_ZOOM,
@@ -45,11 +48,14 @@ export interface AtlasState {
   activeLayer: GrossLayer;
   activeRegionId: string;
   crossBridgeStep: number;
+  eccStepIndex: number;
   fascicleCrossSection: boolean;
+  fiberComparisonMode: boolean;
   fiberType: FiberType;
   fiberVisibility: StructureVisibility<FiberStructureLayer>;
   isAnimationPlaying: boolean;
   molecularRenderMode: MolecularRenderMode;
+  physiologyOverlay: PhysiologyOverlayMode;
   sarcomereLengthUm: number;
   sarcomereVisibility: StructureVisibility<SarcomereStructureLayer>;
   selectedAtomId: string | null;
@@ -58,6 +64,7 @@ export interface AtlasState {
   selectedMuscleId: string;
   selectedNodeId: string;
   selectedProteinId: ProteinId;
+  selectedTissueSystem: TissueSystemId;
   troponinState: TroponinState;
   zoomValue: number;
   zoomTransition: ZoomTransition | null;
@@ -85,6 +92,12 @@ export type AtlasAction =
   | { type: "set_fiber_type"; fiberType: FiberType }
   | { type: "set_sarcomere_length"; lengthUm: number }
   | { type: "set_cross_bridge_step"; step: number }
+  | { type: "set_ecc_step"; step: number }
+  | { type: "next_ecc_step" }
+  | { type: "previous_ecc_step" }
+  | { type: "set_physiology_overlay"; overlay: PhysiologyOverlayMode }
+  | { type: "toggle_fiber_comparison" }
+  | { type: "select_tissue_system"; system: TissueSystemId }
   | { type: "set_molecular_render_mode"; mode: MolecularRenderMode }
   | { type: "set_troponin_state"; state: TroponinState }
   | { type: "toggle_animation" }
@@ -96,7 +109,9 @@ export const DEFAULT_ATLAS_STATE: AtlasState = {
   activeLayer: "skeleton",
   activeRegionId: "lower_limb",
   crossBridgeStep: 0,
+  eccStepIndex: 0,
   fascicleCrossSection: true,
+  fiberComparisonMode: false,
   fiberType: "type_I",
   fiberVisibility: {
     mitochondria: true,
@@ -106,6 +121,7 @@ export const DEFAULT_ATLAS_STATE: AtlasState = {
   },
   isAnimationPlaying: true,
   molecularRenderMode: "surface",
+  physiologyOverlay: "ecc",
   sarcomereLengthUm: 2.4,
   sarcomereVisibility: {
     mLine: true,
@@ -120,6 +136,7 @@ export const DEFAULT_ATLAS_STATE: AtlasState = {
   selectedMuscleId: "rectus_femoris",
   selectedNodeId: "body",
   selectedProteinId: "titin",
+  selectedTissueSystem: "tendon",
   troponinState: "blocked",
   zoomValue: 0,
   zoomTransition: null,
@@ -133,9 +150,12 @@ export function createAtlasStateFromSearch(search: string): AtlasState {
   const fiberType = params.get("fiberType") as FiberType | null;
   const sarcomereLengthUm = Number(params.get("sl"));
   const crossBridgeStep = Number(params.get("bridge"));
+  const eccStepIndex = Number(params.get("ecc"));
   const protein = params.get("protein");
   const domain = params.get("domain");
   const atom = params.get("atom");
+  const physiologyOverlay = parsePhysiologyOverlay(params.get("overlay"));
+  const selectedTissueSystem = parseTissueSystem(params.get("tissue"));
   const molecularRenderMode = parseMolecularRenderMode(params.get("mode"));
   const troponinState = parseTroponinState(params.get("troponin"));
   const selectedProteinId = protein
@@ -151,6 +171,10 @@ export function createAtlasStateFromSearch(search: string): AtlasState {
     crossBridgeStep: Number.isFinite(crossBridgeStep)
       ? Math.max(0, Math.round(crossBridgeStep))
       : DEFAULT_ATLAS_STATE.crossBridgeStep,
+    eccStepIndex: Number.isFinite(eccStepIndex)
+      ? Math.max(0, Math.round(eccStepIndex))
+      : DEFAULT_ATLAS_STATE.eccStepIndex,
+    fiberComparisonMode: params.get("compare") === "fiber",
     fiberType:
       fiberType === "type_I" ||
       fiberType === "type_IIa" ||
@@ -159,6 +183,8 @@ export function createAtlasStateFromSearch(search: string): AtlasState {
         : DEFAULT_ATLAS_STATE.fiberType,
     molecularRenderMode:
       molecularRenderMode ?? DEFAULT_ATLAS_STATE.molecularRenderMode,
+    physiologyOverlay:
+      physiologyOverlay ?? DEFAULT_ATLAS_STATE.physiologyOverlay,
     selectedAtomId: atom ?? DEFAULT_ATLAS_STATE.selectedAtomId,
     selectedDomainId,
     selectedMuscleId: muscle ?? DEFAULT_ATLAS_STATE.selectedMuscleId,
@@ -170,6 +196,8 @@ export function createAtlasStateFromSearch(search: string): AtlasState {
           ? selectedProteinId
           : DEFAULT_ATLAS_STATE.selectedNodeId),
     selectedProteinId,
+    selectedTissueSystem:
+      selectedTissueSystem ?? DEFAULT_ATLAS_STATE.selectedTissueSystem,
     sarcomereLengthUm: Number.isFinite(sarcomereLengthUm)
       ? clampSarcomereLength(sarcomereLengthUm)
       : DEFAULT_ATLAS_STATE.sarcomereLengthUm,
@@ -183,6 +211,33 @@ export function createAtlasStateFromSearch(search: string): AtlasState {
 
 function clampZoom(value: number): number {
   return Math.min(1, Math.max(0, value));
+}
+
+function parsePhysiologyOverlay(
+  value: string | null,
+): PhysiologyOverlayMode | null {
+  if (
+    value === "ecc" ||
+    value === "cross_bridge" ||
+    value === "length_tension"
+  ) {
+    return value;
+  }
+
+  return null;
+}
+
+function parseTissueSystem(value: string | null): TissueSystemId | null {
+  if (
+    value === "tendon" ||
+    value === "bone" ||
+    value === "cartilage" ||
+    value === "joint"
+  ) {
+    return value;
+  }
+
+  return null;
 }
 
 function withZoomTransition(
@@ -500,6 +555,39 @@ export function atlasReducer(
       return {
         ...state,
         crossBridgeStep: Math.max(0, Math.round(action.step)),
+      };
+    case "set_ecc_step":
+      return {
+        ...state,
+        eccStepIndex: Math.max(0, Math.round(action.step)),
+        physiologyOverlay: "ecc",
+      };
+    case "next_ecc_step":
+      return {
+        ...state,
+        eccStepIndex: getNextEccStepIndex(state.eccStepIndex),
+        physiologyOverlay: "ecc",
+      };
+    case "previous_ecc_step":
+      return {
+        ...state,
+        eccStepIndex: getPreviousEccStepIndex(state.eccStepIndex),
+        physiologyOverlay: "ecc",
+      };
+    case "set_physiology_overlay":
+      return {
+        ...state,
+        physiologyOverlay: action.overlay,
+      };
+    case "toggle_fiber_comparison":
+      return {
+        ...state,
+        fiberComparisonMode: !state.fiberComparisonMode,
+      };
+    case "select_tissue_system":
+      return {
+        ...state,
+        selectedTissueSystem: action.system,
       };
     case "set_molecular_render_mode":
       return {

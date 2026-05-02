@@ -1,3 +1,7 @@
+import {
+  getCrossBridgeBiochemistryStep,
+  getLengthTensionPoint,
+} from "@/lib/physiology";
 import { calculateBandGeometry, getLengthTensionForce } from "@/lib/sarcomere";
 import SarcomereFilaments from "../shared/SarcomereFilaments";
 import type { GrossLevelProps } from "../viewer/LevelRenderer";
@@ -37,12 +41,17 @@ function UmBand({
 export default function L8Sarcomere({ dispatch, state }: GrossLevelProps) {
   const bands = calculateBandGeometry(state.sarcomereLengthUm, state.fiberType);
   const force = getLengthTensionForce(state.sarcomereLengthUm);
+  const lengthTension = getLengthTensionPoint(state.sarcomereLengthUm);
+  const bridgeChemistry = getCrossBridgeBiochemistryStep(state.crossBridgeStep);
 
   return (
     <group
       name="L8 sarcomere"
       userData={{
+        crossBridgeBiochemistry: bridgeChemistry.chemistryLabel,
         force,
+        lengthTensionLimb: lengthTension.limb,
+        passiveTitinForce: lengthTension.passiveTitinForce,
         sarcomereLengthUm: state.sarcomereLengthUm,
         thickFilamentLengthUm: bands.thickFilamentLengthUm,
       }}
@@ -149,6 +158,27 @@ export default function L8Sarcomere({ dispatch, state }: GrossLevelProps) {
           <meshStandardMaterial color="#56d2be" roughness={0.5} />
         </mesh>
       ))}
+      <mesh
+        name="length-tension-synchronized-dot"
+        position={[
+          -0.42 + (lengthTension.xPct / 100) * 0.84,
+          0.6 - (lengthTension.yPct / 100) * 0.32,
+          0.26,
+        ]}
+        userData={{
+          activeForce: lengthTension.activeForce,
+          limb: lengthTension.limb,
+          passiveTitinForce: lengthTension.passiveTitinForce,
+        }}
+      >
+        <sphereGeometry args={[0.026, 18, 12]} />
+        <meshStandardMaterial
+          color="#ee7664"
+          emissive="#ee7664"
+          emissiveIntensity={0.28}
+          roughness={0.38}
+        />
+      </mesh>
     </group>
   );
 }

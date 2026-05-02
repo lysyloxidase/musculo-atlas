@@ -529,6 +529,221 @@ h1 {
   border: 0;
 }
 
+.physiology-panel,
+.tissue-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.panel-toolbar,
+.ecc-stepper,
+.biochem-rail,
+.tissue-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.ecc-stepper {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.tissue-tabs {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.physiology-panel button,
+.tissue-panel button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #191918;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.physiology-panel button[aria-pressed="true"],
+.tissue-panel button[aria-pressed="true"] {
+  border-color: var(--teal);
+  background: rgb(95 208 197 / 10%);
+  color: var(--text);
+}
+
+.ecc-step-card,
+.biochem-card,
+.length-tension-card,
+.tissue-detail {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  background: #191918;
+}
+
+.ecc-step-card strong,
+.biochem-card strong,
+.length-tension-card strong,
+.fiber-comparison strong,
+.tissue-detail strong,
+.cartilage-stack strong {
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.step-index,
+.biochem-card span,
+.length-tension-card span,
+.tissue-detail span,
+.cartilage-stack span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.ecc-step-card dl,
+.fiber-comparison dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.ecc-step-card dt,
+.fiber-comparison dt {
+  color: var(--gold);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.ecc-step-card dd,
+.fiber-comparison dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.78rem;
+}
+
+.fiber-comparison {
+  display: grid;
+  gap: 8px;
+}
+
+.fiber-comparison article {
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  background: #191918;
+}
+
+.length-tension-chart {
+  width: 100%;
+  height: 132px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: linear-gradient(
+      90deg,
+      transparent 33%,
+      rgb(255 255 255 / 5%) 33% 66%,
+      transparent 66%
+    ), #151515;
+}
+
+.tissue-detail ol {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.tissue-detail li {
+  color: var(--muted);
+}
+
+.tissue-detail li strong {
+  display: block;
+}
+
+.collagen-crimp {
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: repeating-linear-gradient(
+      90deg,
+      rgb(215 185 93 / 80%) 0 4px,
+      transparent 4px 18px
+    ),
+    radial-gradient(ellipse at center, rgb(238 118 100 / 20%), transparent 70%),
+    #151515;
+  mask-image: radial-gradient(ellipse at center, #000 58%, transparent 62%);
+}
+
+.osteon-visual {
+  position: relative;
+  height: 118px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #151515;
+}
+
+.osteon-visual span {
+  position: absolute;
+  inset: 12px;
+  border: 2px solid rgb(215 185 93 / 70%);
+  border-radius: 50%;
+}
+
+.osteon-visual span:nth-child(2) {
+  inset: 28px;
+}
+
+.osteon-visual span:nth-child(3) {
+  inset: 44px;
+}
+
+.osteon-visual span:nth-child(4) {
+  inset: 54px;
+  border-color: var(--teal);
+  background: rgb(95 208 197 / 18%);
+}
+
+.cartilage-stack {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.cartilage-stack div {
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+}
+
+.cartilage-stack div:nth-child(1) {
+  background: rgb(95 208 197 / 16%);
+}
+
+.cartilage-stack div:nth-child(2) {
+  background: rgb(215 185 93 / 14%);
+}
+
+.cartilage-stack div:nth-child(3) {
+  background: rgb(238 118 100 / 13%);
+}
+
+.cartilage-stack div:nth-child(4) {
+  border-top: 2px solid var(--text);
+  border-bottom: 2px solid var(--text);
+  background: #151515;
+}
+
+.cartilage-stack div:nth-child(5) {
+  background: rgb(157 141 241 / 14%);
+}
+
 .legend-list {
   display: grid;
   gap: 8px;

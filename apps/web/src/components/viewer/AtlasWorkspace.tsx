@@ -9,7 +9,9 @@ import LayerToggle from "../ui/LayerToggle";
 import LegendPanel from "../ui/LegendPanel";
 import MicroAnatomyControls from "../ui/MicroAnatomyControls";
 import MolecularControls from "../ui/MolecularControls";
+import PhysiologyOverlay from "../ui/PhysiologyOverlay";
 import SearchOverlay from "../ui/SearchOverlay";
+import TissueSystemsPanel from "../ui/TissueSystemsPanel";
 import ZoomIndicator from "../ui/ZoomIndicator";
 import AtlasCanvas from "./AtlasCanvas";
 
@@ -111,7 +113,9 @@ export default function AtlasWorkspace() {
           troponinState={state.troponinState}
         />
         <MicroAnatomyControls dispatch={dispatch} state={state} />
+        <PhysiologyOverlay dispatch={dispatch} state={state} />
         <MolecularControls dispatch={dispatch} state={state} />
+        <TissueSystemsPanel dispatch={dispatch} state={state} />
         <LegendPanel />
       </aside>
     </main>
