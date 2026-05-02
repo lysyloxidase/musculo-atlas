@@ -6,7 +6,7 @@ MusculoAtlas is a monorepo atlas for continuous semantic zoom through gross anat
 
 ## Demo Path
 
-![Continuous zoom through MusculoAtlas](docs/media/continuous-zoom-l1-l10.gif)
+![Static MusculoAtlas demo path figure](docs/media/demo-path-figure.png)
 
 Canonical release breadcrumb:
 
